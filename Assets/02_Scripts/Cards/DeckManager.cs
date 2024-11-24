@@ -5,15 +5,9 @@ using UnityEngine;
 public class DeckManager : MonoBehaviour
 {
     public CardDataBase DataBase;
-    int[] imsiIndex = { 10001, 10002, 10003 };
+    int[] imsiIndex = { 10001, 10002, 10003, 20001, 20002, 20003 };
     static DeckManager instance;
-    public static DeckManager Instance
-    {
-        get
-        {
-            return instance;
-        }
-    }
+    public static DeckManager Instance { get { return instance; } }
     private void Awake()
     {
         if (instance != null)
@@ -37,6 +31,14 @@ public class DeckManager : MonoBehaviour
             CardData clone = (CardData)origin.Clone();
             deck.Add(clone);
         }
+        return deck;
+    }
+
+    public List<CardData> GetOpponentAIDeck()
+    {
+        List<CardData> deck = new List<CardData>();
+        // f레벨 메니저에게 AI 적의 덱 정보 요청
+        // deck에 채워넣기
         return deck;
     }
 }

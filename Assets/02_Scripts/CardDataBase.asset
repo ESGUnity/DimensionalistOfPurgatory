@@ -14,20 +14,74 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardDataList:
   - <Id>k__BackingField: 10001
+    <Name>k__BackingField: 
     <Cost>k__BackingField: 1
+    <Health>k__BackingField: 0
+    <Mana>k__BackingField: 0
+    <Damage>k__BackingField: 0
+    <Range>k__BackingField: 0
+    <Ability>k__BackingField: 
     <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <Thumbnail>k__BackingField: {fileID: 0}
+    <IsAstral>k__BackingField: 1
+    <PrayRange>k__BackingField: 0
   - <Id>k__BackingField: 10002
+    <Name>k__BackingField: 
     <Cost>k__BackingField: 1
+    <Health>k__BackingField: 0
+    <Mana>k__BackingField: 0
+    <Damage>k__BackingField: 0
+    <Range>k__BackingField: 0
+    <Ability>k__BackingField: 
     <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <Thumbnail>k__BackingField: {fileID: 0}
+    <IsAstral>k__BackingField: 1
+    <PrayRange>k__BackingField: 0
   - <Id>k__BackingField: 10003
+    <Name>k__BackingField: 
     <Cost>k__BackingField: 1
+    <Health>k__BackingField: 0
+    <Mana>k__BackingField: 0
+    <Damage>k__BackingField: 0
+    <Range>k__BackingField: 0
+    <Ability>k__BackingField: 
     <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <Thumbnail>k__BackingField: {fileID: 0}
+    <IsAstral>k__BackingField: 1
+    <PrayRange>k__BackingField: 0
   - <Id>k__BackingField: 20001
+    <Name>k__BackingField: 
     <Cost>k__BackingField: 2
+    <Health>k__BackingField: 0
+    <Mana>k__BackingField: 0
+    <Damage>k__BackingField: 0
+    <Range>k__BackingField: 0
+    <Ability>k__BackingField: 
     <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <Thumbnail>k__BackingField: {fileID: 0}
+    <IsAstral>k__BackingField: 0
+    <PrayRange>k__BackingField: 2
   - <Id>k__BackingField: 20002
+    <Name>k__BackingField: 
     <Cost>k__BackingField: 2
+    <Health>k__BackingField: 0
+    <Mana>k__BackingField: 0
+    <Damage>k__BackingField: 0
+    <Range>k__BackingField: 0
+    <Ability>k__BackingField: 
     <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <Thumbnail>k__BackingField: {fileID: 0}
+    <IsAstral>k__BackingField: 0
+    <PrayRange>k__BackingField: 3
   - <Id>k__BackingField: 20003
+    <Name>k__BackingField: 
     <Cost>k__BackingField: 2
+    <Health>k__BackingField: 0
+    <Mana>k__BackingField: 0
+    <Damage>k__BackingField: 0
+    <Range>k__BackingField: 0
+    <Ability>k__BackingField: 
     <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <Thumbnail>k__BackingField: {fileID: 0}
+    <IsAstral>k__BackingField: 0
+    <PrayRange>k__BackingField: 3

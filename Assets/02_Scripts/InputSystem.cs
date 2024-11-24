@@ -14,21 +14,23 @@ public class InputSystem : MonoBehaviour
     InputAction rightClickAction;
     InputAction escapeAction;
     Vector3 lastPosition;
-    LayerMask placementLayerMask;
+    LayerMask entireLayerMask;
+    LayerMask astralLayerMask;
+    string thisPlayerTag;
 
-    private static InputSystem instance;
-    public static InputSystem Instance { get { return instance; } }
     private void Awake()
     {
-        instance = this;
+        thisPlayerTag = gameObject.tag;
 
-        if (gameObject.tag == "Player")
+        if (thisPlayerTag == "Player")
         {
-            placementLayerMask = LayerMask.GetMask("PlayerField");
+            entireLayerMask = LayerMask.GetMask("PlayerField");
+            astralLayerMask = LayerMask.GetMask("PlayerAstralField");
         }
-        else
+        else if (thisPlayerTag == "OpponentAI")
         {
-            placementLayerMask = LayerMask.GetMask("OpponentField");
+            entireLayerMask = LayerMask.GetMask("OpponentField");
+            astralLayerMask = LayerMask.GetMask("OpponentAstralField");
         }
 
         inputActions = GetComponent<PlayerInput>().actions;
@@ -54,7 +56,6 @@ public class InputSystem : MonoBehaviour
         if (leftClickAction.IsPressed())
         {
             OnPressedLeft?.Invoke();
-            Debug.Log("±×·¦ ½ÇÇà");
         }
     }
 
@@ -65,21 +66,48 @@ public class InputSystem : MonoBehaviour
         Ray ray = PlayerCamera.ScreenPointToRay(mousePos);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, 1000, placementLayerMask))
+        if (Physics.Raycast(ray, out hit, 1000, entireLayerMask))
         {
             lastPosition = hit.point;
         }
-
         return lastPosition;
     }
-    public bool CanPlacemet()
+    public Vector3 GetMousePositionOnAstralField()
     {
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = PlayerCamera.nearClipPlane;
         Ray ray = PlayerCamera.ScreenPointToRay(mousePos);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, 1000, placementLayerMask))
+        if (Physics.Raycast(ray, out hit, 1000, astralLayerMask))
+        {
+            lastPosition = hit.point;
+        }
+
+        return lastPosition;
+    }
+    public bool CanPlacement()
+    {
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = PlayerCamera.nearClipPlane;
+        Ray ray = PlayerCamera.ScreenPointToRay(mousePos);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 1000, entireLayerMask))
+        {
+            return true;
+        }
+
+        return false;
+    }
+    public bool CanPlacementAstral()
+    {
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = PlayerCamera.nearClipPlane;
+        Ray ray = PlayerCamera.ScreenPointToRay(mousePos);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 1000, astralLayerMask))
         {
             return true;
         }

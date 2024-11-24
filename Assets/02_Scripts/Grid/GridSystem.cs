@@ -7,6 +7,7 @@ public class Vertex
 {
     public Vector3 Coordinate; // 그리드의 중심 좌표
     public GameObject AstralOnGrid; // 그리드 위에 존재하는 영체(게임오브젝트)
+    public bool Visited;
 
     public Vertex(Vector3 coordinate)
     {
@@ -18,10 +19,12 @@ public class Vertex
                                             // float을 쓰면 어쩔 수 없이 오차범위가 생기기 때문에 별도로 오버라이드하여 메서드를 수정했다.    
     {
         float epsilon = 0.0001f;
+
         if (obj is Vertex vertex)
         {
             return Mathf.Abs(Coordinate.x - vertex.Coordinate.x) < epsilon && Mathf.Abs(Coordinate.y - vertex.Coordinate.y) < epsilon && Mathf.Abs(Coordinate.z - vertex.Coordinate.z) < epsilon;
         }
+
         return false;
     }
 
@@ -57,8 +60,6 @@ public class GridGraph : ICloneable
         {
             Vertices.Add(vertex); // 정점 리스트에 새로운 정점 추가
             Adjacencies[vertex] = new List<Vertex>(); // 새로운 정점에 이어지는 간선 리스트 추가
-            //GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube); // 그리드 생성이 잘 되나 확인하는 코드
-            //cube.transform.position = coordinate;  // 큐브 위치 설정
         }
         return vertex;
     }
@@ -72,6 +73,13 @@ public class GridGraph : ICloneable
         }
     }
 
+    public void ClearVisited()
+    {
+        foreach (Vertex v in Vertices)
+        {
+            v.Visited = false;
+        }
+    }
     public object Clone()
     {
         return new GridGraph { Vertices = this.Vertices, Adjacencies = this.Adjacencies };
@@ -148,5 +156,34 @@ public class GridSystem : MonoBehaviour
             }
         }
         return closestVertex;
+    }
+    public List<Vector3> GridVisualBFS(int prayRange, Vertex startVertex)
+    {
+        List<Vector3> vertices = new List<Vector3>();
+
+        //Queue<Vertex> queue = new Queue<Vertex>();
+        //startVertex.Visited = true;
+        //queue.Enqueue(startVertex);
+
+        //while (!(Vector3.Distance(queue.Peek().Coordinate, startVertex.Coordinate) > prayRange * Mathf.Sqrt(3))) // 큐를 Peek한 Vertex의 좌표와 시작 정점 좌표 거리를 구할 때, 기도 범위보다 크다면 반환
+        //{
+        //    Vertex vertex = queue.Dequeue();
+        //    vertices.Add(vertex.Coordinate);
+
+        //    foreach (Vertex v in Grids.Adjacencies[vertex])
+        //    {
+        //        if (!v.Visited)
+        //        {
+        //            v.Visited = true;;
+        //            queue.Enqueue(v);
+        //        }
+        //    }
+        //}
+        ////Grids.ClearVisited();
+
+        //return vertices;
+
+        vertices.Add(startVertex.Coordinate);
+        return vertices;
     }
 }
