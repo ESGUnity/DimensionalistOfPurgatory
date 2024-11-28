@@ -56,7 +56,8 @@ public class GridGraph : ICloneable
     public Vertex AddVertex(Vector3 coordinate) // 정점 추가 메서드
     {
         Vertex vertex = new Vertex(coordinate); // 매개변수 Vector3로 새로운 정점 선언
-        if (!Vertices.Contains(vertex))
+
+        if (!Vertices.Contains(vertex)) // 중복되는 vertex를 걸러내는 조건문
         {
             Vertices.Add(vertex); // 정점 리스트에 새로운 정점 추가
             Adjacencies[vertex] = new List<Vertex>(); // 새로운 정점에 이어지는 간선 리스트 추가
@@ -86,13 +87,12 @@ public class GridGraph : ICloneable
     }
 }
 
-public class GridSystem : MonoBehaviour
+public class GridManager : MonoBehaviour
 {
-    public GridGraph Grids = new GridGraph();
-    public GameObject HexPrefab;
+    public GridGraph Grids = new();
 
-    private static GridSystem instance;
-    public static GridSystem Instance
+    private static GridManager instance;
+    public static GridManager Instance
     {
         get
         {
@@ -185,5 +185,38 @@ public class GridSystem : MonoBehaviour
 
         vertices.Add(startVertex.Coordinate);
         return vertices;
+    }
+    public Vertex FindTargetVertex(Vertex requesterVertex, string targetTag)
+    {
+        Queue<Vertex> queue = new();
+        int distance;
+        Vertex targetVertex = null;
+
+        requesterVertex.Visited = true;
+        queue.Enqueue(requesterVertex);
+
+        while (queue.Count > 0)
+        {
+            Vertex vertex = queue.Dequeue();
+
+            if (vertex.AstralOnGrid.tag == targetTag)
+            {
+                targetVertex = vertex;
+                break;
+            }
+            else
+            {
+                foreach (Vertex adVertex in Grids.Adjacencies[vertex])
+                {
+                    if (!adVertex.Visited)
+                    {
+                        adVertex.Visited = true;
+                        queue.Enqueue(adVertex);
+                    }
+                }
+            }
+        }
+
+        return targetVertex;
     }
 }

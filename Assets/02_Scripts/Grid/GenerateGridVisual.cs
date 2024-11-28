@@ -9,7 +9,7 @@ public class GenerateGridVisual : MonoBehaviour
     [SerializeField] GameObject YellowHexPrefab;
     [SerializeField] GameObject GreenHexPrefab;
     [SerializeField] GameObject RedHexPrefab;
-    [SerializeField] TMP_Text PrayPledgeAvailable;
+    [SerializeField] TMP_Text PrayPledgeAvailableText;
 
     List<GameObject> AstralGridList = new();
     List<GameObject> PrayGridList = new();
@@ -73,15 +73,15 @@ public class GenerateGridVisual : MonoBehaviour
 
     private void Update()
     {
-        gridPosition = (GridSystem.Instance.GetGridPosFromWorldPos(mousePosition)).Coordinate;
-        gridVertex = GridSystem.Instance.GetGridPosFromWorldPos(mousePosition);
+        gridPosition = (GridManager.Instance.GetGridPosFromWorldPos(mousePosition)).Coordinate;
+        gridVertex = GridManager.Instance.GetGridPosFromWorldPos(mousePosition);
     }
 
     void CreateAstralGrid()
     {
         if (thisPlayerTag == "Player")
         {
-            foreach (Vertex vertex in GridSystem.Instance.Grids.Vertices)
+            foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
             {
                 if (vertex.Coordinate.z < 0)
                 {
@@ -93,7 +93,7 @@ public class GenerateGridVisual : MonoBehaviour
         }
         else if (thisPlayerTag == "OpponentAI")
         {
-            foreach (Vertex vertex in GridSystem.Instance.Grids.Vertices)
+            foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
             {
                 if (vertex.Coordinate.z > 0)
                 {
@@ -106,7 +106,7 @@ public class GenerateGridVisual : MonoBehaviour
     }
     void CreatePrayGrid()
     {
-        foreach (Vertex vertex in GridSystem.Instance.Grids.Vertices)
+        foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
         {
             GameObject go = Instantiate(YellowHexPrefab);
             go.transform.position = vertex.Coordinate + new Vector3(0, 0.01f, 0);
@@ -122,7 +122,7 @@ public class GenerateGridVisual : MonoBehaviour
     }
     void CreateWholeGrid()
     {
-        foreach (Vertex vertex in GridSystem.Instance.Grids.Vertices)
+        foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
         {
             GameObject go = Instantiate(GreenHexPrefab);
             go.transform.position = vertex.Coordinate + new Vector3(0, 0.015f, 0);
@@ -284,10 +284,10 @@ public class GenerateGridVisual : MonoBehaviour
                             break;
                     }
 
-                    PrayPledgeAvailable.gameObject.SetActive(true);
-                    PrayPledgeAvailable.text = "기도 서약하기";
-                    PrayPledgeAvailable.gameObject.transform.position = gridPosition + new Vector3(0, 1f, 0);
-                    PrayPledgeAvailable.gameObject.transform.LookAt(PrayPledgeAvailable.gameObject.transform.position + GetComponent<InputSystem>().PlayerCamera.transform.forward);
+                    PrayPledgeAvailableText.gameObject.SetActive(true);
+                    PrayPledgeAvailableText.text = "기도 서약하기";
+                    PrayPledgeAvailableText.gameObject.transform.position = gridPosition + new Vector3(0, 1f, 0);
+                    PrayPledgeAvailableText.gameObject.transform.LookAt(PrayPledgeAvailableText.gameObject.transform.position + GetComponent<InputSystem>().PlayerCamera.transform.forward);
                 }
                 else
                 {
@@ -296,7 +296,7 @@ public class GenerateGridVisual : MonoBehaviour
                         WholeGridList[pos].SetActive(false);
                     }
 
-                    PrayPledgeAvailable.gameObject.SetActive(false);
+                    PrayPledgeAvailableText.gameObject.SetActive(false);
                 }
             }
             else if (!GetComponent<InputSystem>().CanPlacement())
@@ -308,7 +308,7 @@ public class GenerateGridVisual : MonoBehaviour
 
                 lastPosition = new Vector3(0, 0, 0);
 
-                PrayPledgeAvailable.gameObject.SetActive(false);
+                PrayPledgeAvailableText.gameObject.SetActive(false);
             }
             else
             {
@@ -322,7 +322,7 @@ public class GenerateGridVisual : MonoBehaviour
                 WholeGridList[pos].SetActive(false);
             }
 
-            PrayPledgeAvailable.gameObject.SetActive(false);
+            PrayPledgeAvailableText.gameObject.SetActive(false);
         }
     }
 }

@@ -67,16 +67,24 @@ public class HandSystem : MonoBehaviour
 
     void Update()
     {
-        
-
         if (CardManager.Instance.CountDeck(thisPlayerTag) <= 0 && !(PhaseManager.Instance.CurrentPhase == Phase.Preparation))  
         {
             CardManager.Instance.FillDeck(thisPlayerTag);
         }
 
         ImportDrawCardToHand();
-        PutOutCardInPreparation();
-        PutOutCardInBattle();
+
+        if (PhaseManager.Instance.CurrentPhase == Phase.AfterPreparation || PhaseManager.Instance.CurrentPhase == Phase.AfterBattle) // 준비 및 전투 단계를 벗어나면 카드 드래그를 멈추기
+        {
+            GetComponent<PlacementSystem>().StopAstralPlacement();
+            GetComponent<PlacementSystem>().StopPrayPledge();
+            // StopPrayPlacement도 꼭 넣자!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        }
+        else
+        {
+            PutOutCardInPreparation();
+            PutOutCardInBattle();
+        }
     }
 
     
@@ -133,12 +141,6 @@ public class HandSystem : MonoBehaviour
                 ManageDragCard(cardPosOnHand[cardPosE]);
             }
         }
-        else // 준비 단계가 끝났는데 카드를 드래그하고 있을 경우, 드래그 한 채로 전투 단계로 넘어가면 전투 단계에서도 카드를 배치할 수 있게 된다.
-        {
-            GetComponent<PlacementSystem>().StopAstralPlacement();
-            GetComponent<PlacementSystem>().StopPrayPledge();
-        }
-
     }
     public void ImportPledgePrayToHand(CardData pledgePray) // 준비 단계에서 기도 서약하는 메서드
     {
@@ -167,7 +169,6 @@ public class HandSystem : MonoBehaviour
             Debug.Log("기도를 등록하는 단계가 아닙니다.");
             // 대충 알려주는 UI 
         }
-
     }
     void PutOutCardInBattle() // 서약한 기도를 내는 걸 담당하는 메서드
     {
@@ -257,18 +258,23 @@ public class HandSystem : MonoBehaviour
 
     IEnumerator SwapPreparation()
     {
-        BattleHand.transform.DOMove(swapPos.position, 0.3f);
-        yield return new WaitForSeconds(0.3f);
-        BattleHand.gameObject.SetActive(false);
+        BattleHand.transform.DOMove(swapPos.position, 0.5f);
+        yield return new WaitForSeconds(0.5f);
+        preparationHand.transform.DOMove(handPos.position, 0.5f);
+
         preparationHand.gameObject.SetActive(true);
-        preparationHand.transform.DOMove(handPos.position, 0.3f);
+        yield return new WaitForSeconds(0.5f);
+        BattleHand.gameObject.SetActive(false);
+
     }
     IEnumerator SwapBattle()
     {
-        preparationHand.transform.DOMove(swapPos.position, 0.3f);
-        yield return new WaitForSeconds(0.3f);
+        preparationHand.transform.DOMove(swapPos.position, 0.5f);
+        yield return new WaitForSeconds(0.5f);
+        BattleHand.transform.DOMove(handPos.position, 0.5f);
+
         BattleHand.gameObject.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
         preparationHand.gameObject.SetActive(false);
-        BattleHand.transform.DOMove(handPos.position, 0.3f);
     }
 }

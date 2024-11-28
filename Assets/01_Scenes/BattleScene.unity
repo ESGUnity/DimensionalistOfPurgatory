@@ -304,7 +304,7 @@ GameObject:
   - component: {fileID: 301504689}
   - component: {fileID: 301504688}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: '[Temp]Plane'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1072,7 +1072,7 @@ MonoBehaviour:
   YellowHexPrefab: {fileID: 7242540933819272764, guid: 0b9f95fbd35b3bf43bcd6c74a2cb2172, type: 3}
   GreenHexPrefab: {fileID: 8129739314788841348, guid: 779ae6d919713c349ad3bad620c98bd1, type: 3}
   RedHexPrefab: {fileID: 8129739314788841348, guid: 3b524a4eb8bf7c54099141968e259bc3, type: 3}
-  PrayPledgeAvailable: {fileID: 1601451927}
+  PrayPledgeAvailableText: {fileID: 1601451927}
   gridPosition: {x: 0, y: 0, z: 0}
   lastPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &828391442
@@ -1170,7 +1170,7 @@ GameObject:
   - component: {fileID: 850922033}
   - component: {fileID: 850922032}
   m_Layer: 0
-  m_Name: GridSystem
+  m_Name: GridManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1185,10 +1185,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 850922031}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b86024d7733ecd2499cc338fcbc0f406, type: 3}
+  m_Script: {fileID: 11500000, guid: 60df4ddeee72b4e44832d91e6b410a90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HexPrefab: {fileID: 0}
 --- !u!4 &850922033
 Transform:
   m_ObjectHideFlags: 0

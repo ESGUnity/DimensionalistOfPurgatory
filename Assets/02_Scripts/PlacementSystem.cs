@@ -24,8 +24,8 @@ public class PlacementSystem : MonoBehaviour // 현재로써는 두 명의 플레이어 배치
     void Update()
     {
         //mousePosition = GetComponent<InputSystem>().GetMousePositionOnField(); // 
-        gridVertex = GridSystem.Instance.GetGridPosFromWorldPos(mousePosition);
-        gridPosition = (GridSystem.Instance.GetGridPosFromWorldPos(mousePosition)).Coordinate;
+        gridVertex = GridManager.Instance.GetGridPosFromWorldPos(mousePosition);
+        gridPosition = (GridManager.Instance.GetGridPosFromWorldPos(mousePosition)).Coordinate;
 
     }
 
@@ -77,7 +77,7 @@ public class PlacementSystem : MonoBehaviour // 현재로써는 두 명의 플레이어 배치
         GameObject go = Instantiate(selectedCardData.Prefab);
         go.transform.position = gridPosition; // 영체 위치 설정
         go.tag = thisPlayerTag; // 영체 태그 설정
-        //go.GetComponent<AstralBody>().SetAstralInfo(selectedCardData); // 영체 정보 설정
+        //go.GetComponent<AstralBody>().SetAstralInfo(gridVertex, selectedCardData); // 영체 정보 설정 // 추후 반드시 활성화
         gridVertex.AstralOnGrid = go; // 그리드에 영체 할당
 
         selectedCardPrefab.GetComponent<InteractableCard>().DestroyCardPrefab(); // 카드 프리팹 제거
@@ -106,7 +106,7 @@ public class PlacementSystem : MonoBehaviour // 현재로써는 두 명의 플레이어 배치
     {
         if (!GetComponent<InputSystem>().CanPlacement()) // 기도를 서약할 수 없는 커서 위치에서 서약을 하려고 하면 리턴
         {
-            StopAstralPlacement();
+            StopPrayPledge();
             return;
         }
 

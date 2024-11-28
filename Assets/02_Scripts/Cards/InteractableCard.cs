@@ -7,23 +7,29 @@ using UnityEngine.UI;
 
 public class InteractableCard : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("SetEssential")]
     public TextMeshProUGUI Name, Cost, Health, Mana, Damage, Range, Ability;
     public Image Thumbnail;
 
-    [Header("CannotBeTouched")]
-    public CardData cardData;
-    public bool isHolding = false;
-    public bool isStartPlacement = false;
+    [HideInInspector] public CardData cardData;
+    [HideInInspector] public bool isHolding = false;
+    [HideInInspector] public bool isOver = false;
+    [HideInInspector] public bool isStartPlacement = false;
 
     Vector3 OriginPosition;
     Vector3 OriginScale = new Vector3(0.8f, 0.8f, 0.8f);
 
     private void Update()
     {
-        if (isHolding) // 드래그 중이라면
+        if (PhaseManager.Instance.CurrentPhase == Phase.AfterPreparation || PhaseManager.Instance.CurrentPhase == Phase.AfterBattle) // 준비 및 전투 단계를 벗어나면 카드 드래그를 멈추기
         {
-            transform.parent.SetAsLastSibling(); // 하이라키 상의 오브젝트 순서를 바꾸어 드래그 중인 UI가 항상 제일 위에 위치하도록 설정.
+            isHolding = false;
+            isStartPlacement = false;
+            BackToOriginTransform();
+        }
+
+        else if (isHolding) // 드래그 중이라면
+        {
+            transform.parent.SetAsLastSibling(); // 하이라키 상의 오브젝트 순서를 바꾸어 드래그 중인 UI가 항상 제일 위에 위치하도록 설정
         }
     }
 
@@ -39,12 +45,13 @@ public class InteractableCard : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
-        transform.localScale = OriginScale * 1.2f;
-        transform.position += new Vector3(0, 20, 0);
+        isOver = true;
+        transform.DOScale(OriginScale * 1.3f, 0.3f);
+        transform.DOLocalMove(new Vector3(0, 20, 0), 0.3f);
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (!isHolding || PhaseManager.Instance.CurrentPhase == Phase.AfterPreparation || PhaseManager.Instance.CurrentPhase == Phase.AfterBattle)
+        if (!isHolding) //  || PhaseManager.Instance.CurrentPhase == Phase.AfterPreparation || PhaseManager.Instance.CurrentPhase == Phase.AfterBattle
         {
             BackToOriginTransform();
         }

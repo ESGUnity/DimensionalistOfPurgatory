@@ -18,7 +18,7 @@ public class GenerateField : MonoBehaviour
     {
         if (thisPlayerTag == "Player")
         {
-            foreach (Vertex vertex in GridSystem.Instance.Grids.Vertices)
+            foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
             {
                 if (vertex.Coordinate.z < 0)
                 {
@@ -31,7 +31,7 @@ public class GenerateField : MonoBehaviour
         }
         else if (thisPlayerTag == "OpponentAI")
         {
-            foreach (Vertex vertex in GridSystem.Instance.Grids.Vertices)
+            foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
             {
                 if (vertex.Coordinate.z > 0)
                 {
@@ -47,7 +47,7 @@ public class GenerateField : MonoBehaviour
     {
         if (thisPlayerTag == "Player")
         {
-            foreach (Vertex vertex in GridSystem.Instance.Grids.Vertices)
+            foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
             {
                 GameObject go = Instantiate(hexColliderPrefab);
                 SetLayerRecursively(go, "PlayerField");
@@ -57,7 +57,7 @@ public class GenerateField : MonoBehaviour
         }
         else if (thisPlayerTag == "OpponentAI")
         {
-            foreach (Vertex vertex in GridSystem.Instance.Grids.Vertices)
+            foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
             {
                 GameObject go = Instantiate(hexColliderPrefab);
                 SetLayerRecursively(go, "OpponentField");

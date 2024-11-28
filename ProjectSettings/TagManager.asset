@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Opponent
   - OpponentAI
+  - DeckNamePlate
   layers:
   - Default
   - TransparentFX

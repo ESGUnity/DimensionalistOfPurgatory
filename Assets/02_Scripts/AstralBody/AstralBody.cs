@@ -1,5 +1,5 @@
 using UnityEngine;
-public enum AstralState
+public enum AstralState // [Temp] 거의 쓸모없긴함 [Temp]
 {
     Idle,
     Move,
@@ -11,10 +11,12 @@ public enum AstralState
 public class AstralBody : MonoBehaviour
 {
     CardData cardData;
-    AstralStats astralStats;
-    AstralState astralState;
+    Vertex gridVertex;
+    AstralState astralState; // 거의 쓸모없긴함 [Temp]
     string masterPlayerTag;
+    AstralStats astralStats;
     Animator animator;
+
 
     private void Awake()
     {
@@ -52,12 +54,13 @@ public class AstralBody : MonoBehaviour
     {
         
     }
-    public void SetAstralInfo(CardData cardData)
+    public void SetAstralInfo(Vertex gridVertex, CardData cardData)
     {
+        this.gridVertex = gridVertex;
         this.cardData = cardData;
         astralStats.SetAstralStats(cardData);
     }
-    public void SelectAction()
+    public void SelectAction() // 행동의 우선순위!
     {
         if (astralStats.MaxRitual != 0 && astralStats.CurrentRitual == astralStats.MaxRitual)
         {

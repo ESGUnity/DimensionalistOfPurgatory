@@ -23,7 +23,7 @@ public class PhaseManager : MonoBehaviour
 
     float afterTime = 2f;
     float preparationTime = 10f;
-    float battleTime = 50f;   
+    float battleTime = 5f;   
 
     static PhaseManager instance;
     public static PhaseManager Instance { get { return instance; } }
