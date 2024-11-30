@@ -48,7 +48,6 @@ public class PlacementSystem : MonoBehaviour // 현재로써는 두 명의 플레이어 배치
             {
                 GetComponent<GenerateGridVisual>().OnPrayGridVisual(true);
 
-
                 GetComponent<InputSystem>().OnPressedLeft += GrapPray;
                 GetComponent<InputSystem>().OnReleasedLeft += PledgePray;
             }
@@ -56,10 +55,10 @@ public class PlacementSystem : MonoBehaviour // 현재로써는 두 명의 플레이어 배치
     }
     public void GrapAstral()
     {
-        previewAstral.transform.position = gridPosition + new Vector3(0, 0.3f, 0);
-
         mousePosition = GetComponent<InputSystem>().GetMousePositionOnAstralField();
         GetComponent<GenerateGridVisual>().OnAstralIndicator(true);
+
+        previewAstral.transform.position = gridPosition + new Vector3(0, 0.3f, 0);
     }
     public void PlacementAstral()
     {
@@ -76,12 +75,10 @@ public class PlacementSystem : MonoBehaviour // 현재로써는 두 명의 플레이어 배치
 
         GameObject go = Instantiate(selectedCardData.Prefab);
         go.transform.position = gridPosition; // 영체 위치 설정
-        go.tag = thisPlayerTag; // 영체 태그 설정
-        //go.GetComponent<AstralBody>().SetAstralInfo(gridVertex, selectedCardData); // 영체 정보 설정 // 추후 반드시 활성화
-        gridVertex.AstralOnGrid = go; // 그리드에 영체 할당
+        go.GetComponent<AstralBody>().SetAstralInfo(gridVertex, selectedCardData, thisPlayerTag); // 영체 정보 설정 // 추후 반드시 활성화
 
         selectedCardPrefab.GetComponent<InteractableCard>().DestroyCardPrefab(); // 카드 프리팹 제거
-        GetComponent<HandSystem>().HandCount--; // HandSystem에도 카드가 사용되어 배치됨을 알림.
+        GetComponent<HandSystem>().HandCount--; // HandSystem에도 카드가 사용되어 손패가 줄도록 만들기
         StopAstralPlacement();
     }
     public void StopAstralPlacement()

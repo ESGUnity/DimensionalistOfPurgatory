@@ -19,7 +19,7 @@ MonoBehaviour:
     <Ability>k__BackingField: 
     <Thumbnail>k__BackingField: {fileID: 0}
     <IsAstral>k__BackingField: 1
-    <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <Prefab>k__BackingField: {fileID: 1019634081241183354, guid: 0b57887f58b6b86498d7b703f48534ea, type: 3}
     <Health>k__BackingField: 0
     <Mana>k__BackingField: 0
     <Damage>k__BackingField: 0
@@ -33,7 +33,7 @@ MonoBehaviour:
     <Ability>k__BackingField: 
     <Thumbnail>k__BackingField: {fileID: 0}
     <IsAstral>k__BackingField: 1
-    <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <Prefab>k__BackingField: {fileID: 1019634081241183354, guid: 0b57887f58b6b86498d7b703f48534ea, type: 3}
     <Health>k__BackingField: 0
     <Mana>k__BackingField: 0
     <Damage>k__BackingField: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
     <Ability>k__BackingField: 
     <Thumbnail>k__BackingField: {fileID: 0}
     <IsAstral>k__BackingField: 1
-    <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <Prefab>k__BackingField: {fileID: 1019634081241183354, guid: 0b57887f58b6b86498d7b703f48534ea, type: 3}
     <Health>k__BackingField: 0
     <Mana>k__BackingField: 0
     <Damage>k__BackingField: 0
@@ -61,7 +61,7 @@ MonoBehaviour:
     <Ability>k__BackingField: 
     <Thumbnail>k__BackingField: {fileID: 0}
     <IsAstral>k__BackingField: 0
-    <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <Prefab>k__BackingField: {fileID: 0}
     <Health>k__BackingField: 0
     <Mana>k__BackingField: 0
     <Damage>k__BackingField: 0
@@ -88,8 +88,8 @@ MonoBehaviour:
     <Cost>k__BackingField: 2
     <Ability>k__BackingField: 
     <Thumbnail>k__BackingField: {fileID: 0}
-    <IsAstral>k__BackingField: 0
-    <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <IsAstral>k__BackingField: 1
+    <Prefab>k__BackingField: {fileID: 1019634081241183354, guid: 0b57887f58b6b86498d7b703f48534ea, type: 3}
     <Health>k__BackingField: 0
     <Mana>k__BackingField: 0
     <Damage>k__BackingField: 0
@@ -103,7 +103,7 @@ MonoBehaviour:
     <Ability>k__BackingField: "\uC5F4\uB2E4"
     <Thumbnail>k__BackingField: {fileID: 0}
     <IsAstral>k__BackingField: 1
-    <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <Prefab>k__BackingField: {fileID: 1019634081241183354, guid: 0b57887f58b6b86498d7b703f48534ea, type: 3}
     <Health>k__BackingField: 100
     <Mana>k__BackingField: 30
     <Damage>k__BackingField: 10
@@ -117,7 +117,7 @@ MonoBehaviour:
     <Ability>k__BackingField: "\uBB18\uBB18"
     <Thumbnail>k__BackingField: {fileID: 0}
     <IsAstral>k__BackingField: 1
-    <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
+    <Prefab>k__BackingField: {fileID: 1019634081241183354, guid: 0b57887f58b6b86498d7b703f48534ea, type: 3}
     <Health>k__BackingField: 100
     <Mana>k__BackingField: 30
     <Damage>k__BackingField: 10

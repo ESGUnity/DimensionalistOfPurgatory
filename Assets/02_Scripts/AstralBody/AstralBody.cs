@@ -1,28 +1,19 @@
 using UnityEngine;
-public enum AstralState // [Temp] 거의 쓸모없긴함 [Temp]
-{
-    Idle,
-    Move,
-    Attack,
-    Ability,
-    Dead
-}
 
 public class AstralBody : MonoBehaviour
 {
     CardData cardData;
-    Vertex gridVertex;
-    AstralState astralState; // 거의 쓸모없긴함 [Temp]
-    string masterPlayerTag;
     AstralStats astralStats;
-    Animator animator;
+    AstralAnimStateMachine astralAnimStateMachine;
 
+    public Vertex thisGridVertex;
+    Vertex targetEnemyGridVertex;
+    string masterPlayerTag;
+    string opponentTag;
 
     private void Awake()
     {
-        masterPlayerTag = gameObject.tag;
-        astralStats = GetComponent<AstralStats>();
-        animator = GetComponent<Animator>();
+        
     }
     private void OnEnable()
     {
@@ -54,14 +45,38 @@ public class AstralBody : MonoBehaviour
     {
         
     }
-    public void SetAstralInfo(Vertex gridVertex, CardData cardData)
+    public void SetAstralInfo(Vertex thisGridVertex, CardData cardData, string thisPlayerTag)
     {
-        this.gridVertex = gridVertex;
+        this.thisGridVertex = thisGridVertex;
+        thisGridVertex.AstralOnGrid = gameObject; // 그리드 정보에 자기 자신을 할당
+
         this.cardData = cardData;
-        astralStats.SetAstralStats(cardData);
+        astralStats = new AstralStats(cardData, this); // 영체 스탯 설정
+
+        masterPlayerTag = thisPlayerTag; // 영체 주인의 태그 설정
+        gameObject.tag = masterPlayerTag; // 자기 자신의 태그 설정
+
+        if (masterPlayerTag == "Player")
+        {
+            opponentTag = "Opponent";
+        }
+        else if (masterPlayerTag == "Opponent")
+        {
+            opponentTag = "Player";
+        }
+
+        PhaseManager.Instance.phaseStorageBattleInfo.AddAstralInList(gameObject); // 전장에 영체가 존재한다는 정보 전달
+
+        astralAnimStateMachine = new AstralAnimStateMachine(GetComponent<Animator>());
     }
     public void SelectAction() // 행동의 우선순위!
     {
+        int distance = SetTargetPosition();
+        if (targetEnemyGridVertex == null) // 만약 적이 없는데 SelectAction이 호출되었다면 즉시 리턴
+        {
+            return;
+        }
+
         if (astralStats.MaxRitual != 0 && astralStats.CurrentRitual == astralStats.MaxRitual)
         {
             DoRitual();
@@ -81,27 +96,35 @@ public class AstralBody : MonoBehaviour
         }
     }
 
-    void RequestTargetPosition()
+    int SetTargetPosition()
     {
-        // 그리드 시스템에 현재 오브젝트의 그리드 버텍스(이 오브젝트 자체를 보내서 그리드 시스템 쪽에서 서치하게 만들기)와 태그 넘겨서 타겟 위치 찾기/ 아니면 플레이스먼트시스템에서 애초에 그리드 버텍스 정보까지 아스트랄 바디로 넘기기(이게 좋을듯 계속해서 보내야하니까 맨날 찾게 만들면 부담될듯 ㅇㅋ)
-        // 이동 및 공격여부를 따지는 메서드는 별도 생성
+        targetEnemyGridVertex = GridManager.Instance.FindTargetVertex(thisGridVertex, opponentTag, out int depth);
+
+        return depth;
     }
 
 
 
-
-    void DoRitual()
-    {
-
-    }
     void DoIdle()
     {
-
+        astralAnimStateMachine.OnIdle();
     }
-    void DoMove()
+    void DoRitual()
     {
-
+        // 영체 소환
+        astralAnimStateMachine.OnRitual();
     }
+    void DoManaAbility()
+    {
+        ManaAbility();
+        astralStats.CurrentMana = 0;
+    }
+    void DoConditionAbility()
+    {
+        ConditionAbility();
+        astralStats.CurrentCondition = 0;
+    }
+
 
     void DoMeleeAttack()
     {
@@ -113,25 +136,23 @@ public class AstralBody : MonoBehaviour
 
     }
 
-    void DoManaAbility()
+    void DoMove()
     {
-        // 애니메이터에서 마나어빌리티 애니메이션 클립의 시간 가져오기
-        // PhaseManager.Instance.RemainTurnTime(애니메이션 클립 시간)을 하고 클립 시간이 RemainTurnTime보다 크다면 클립 시간을 RemainTurnTime에 할당
-        // PhaseManager는 그리드 시스템에서 영체 정보를 받아 한 쪽의 영체가 전멸하면 if문으로 battlePhase 코루틴 즉시 종료시키기
-        ManaAbility();
-        astralStats.CurrentMana = 0;
+
     }
-    void DoConditionAbility()
-    {
-        ConditionAbility();
-        astralStats.CurrentCondition = 0;
-    }
+
     void DoDead()
     {
         DeadAbility();
+        PhaseManager.Instance.phaseStorageBattleInfo.RemoveAstralInList(gameObject);
+
+        // Dead Anim 받아서 클립 시간만큼 PhaseManager로 보내기
     }
 
+    public virtual void FillCondition()
+    {
 
+    }
     public virtual void ManaAbility()
     {
 

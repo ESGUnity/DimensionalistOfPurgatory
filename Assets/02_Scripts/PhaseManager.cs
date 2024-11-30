@@ -11,25 +11,31 @@ public enum Phase
 }
 public class PhaseManager : MonoBehaviour
 {
-    public event Action OnAfterPreparation;
-    public event Action OnAfterBattle;
-    public event Action PlayerBattleTurn;
-    public event Action OpponentBattleTurn;
+    public event Action OnAfterPreparation; // HandSystem에서 구독
+    public event Action OnAfterBattle; // HandSystem에서 구독
+    public event Action PlayerBattleTurn; // AstralBody에서 구독
+    public event Action OpponentBattleTurn; // AstralBody에서 구독
+    public PhaseStorageBattleInfo phaseStorageBattleInfo;
 
 
 
     [HideInInspector] public Phase CurrentPhase;
     [HideInInspector] public float RemainTime;
 
+    float initializeTime = 0.1f;
     float afterTime = 2f;
-    float preparationTime = 10f;
-    float battleTime = 5f;   
+    float preparationTime = 100f;
+    float battleTime = 5f;
+    string strikeFirst = "Player";
+    float remainTurnTime = 0;
 
     static PhaseManager instance;
     public static PhaseManager Instance { get { return instance; } }
     private void Awake()
     {
         instance = this;
+
+        phaseStorageBattleInfo = new PhaseStorageBattleInfo();
     }
     void Start()
     {
@@ -43,8 +49,11 @@ public class PhaseManager : MonoBehaviour
     IEnumerator InitializeGame()
     {
         CurrentPhase = Phase.AfterBattle;
-        yield return new WaitForSeconds(3f);
+
+        yield return new WaitForSeconds(initializeTime);
+
         OnAfterBattle?.Invoke();
+
         StartCoroutine(PreparationPhase());
     }
     IEnumerator PreparationPhase()
@@ -78,11 +87,44 @@ public class PhaseManager : MonoBehaviour
     {
         CurrentPhase = Phase.Battle;
 
-        RemainTime = battleTime;
-        while (RemainTime > 0)
+        bool isPlayerTrun = strikeFirst != "Player"; // 이전 선공자가 Player였는지 아닌지를 반환
+
+        while (phaseStorageBattleInfo.EndBattlePhase() == "Resume")
         {
-            RemainTime -= Time.deltaTime;
-            yield return null;
+            if (isPlayerTrun)
+            {
+                OpponentBattleTurn?.Invoke();
+            }
+            else
+            {
+                PlayerBattleTurn?.Invoke();
+            }
+
+            yield return new WaitForSeconds(remainTurnTime);
+            remainTurnTime = 0;
+            isPlayerTrun ^= true;
+        }
+        // 승자에 따른 전투 단계 결과
+        if (phaseStorageBattleInfo.DecideWinner() == "Draw")
+        {
+
+        }
+        else if (phaseStorageBattleInfo.DecideWinner() == "Player")
+        {
+
+        }
+        else if (phaseStorageBattleInfo.DecideWinner() == "Opponent")
+        {
+
+        } 
+        // 선공자 바꾸기
+        if (strikeFirst == "Player")
+        {
+            strikeFirst = "Opponent";
+        }
+        else
+        {
+            strikeFirst = "Player";
         }
 
         StartCoroutine(AfterBattlePhase());
@@ -100,5 +142,13 @@ public class PhaseManager : MonoBehaviour
         }
 
         StartCoroutine(PreparationPhase());
+    }
+
+    public void SetAstralActionTerm(float clipLength)
+    {
+        if (clipLength > remainTurnTime)
+        {
+            remainTurnTime = clipLength;
+        }
     }
 }

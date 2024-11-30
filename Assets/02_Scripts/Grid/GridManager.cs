@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 public class Vertex
 {
     public Vector3 Coordinate; // 그리드의 중심 좌표
     public GameObject AstralOnGrid; // 그리드 위에 존재하는 영체(게임오브젝트)
-    public bool Visited;
+    public bool Visited = false;
 
     public Vertex(Vector3 coordinate)
     {
@@ -62,6 +63,7 @@ public class GridGraph : ICloneable
             Vertices.Add(vertex); // 정점 리스트에 새로운 정점 추가
             Adjacencies[vertex] = new List<Vertex>(); // 새로운 정점에 이어지는 간선 리스트 추가
         }
+
         return vertex;
     }
 
@@ -78,7 +80,10 @@ public class GridGraph : ICloneable
     {
         foreach (Vertex v in Vertices)
         {
-            v.Visited = false;
+            if (v.Visited)
+            {
+                v.Visited = false;
+            }
         }
     }
     public object Clone()
@@ -90,6 +95,16 @@ public class GridGraph : ICloneable
 public class GridManager : MonoBehaviour
 {
     public GridGraph Grids = new();
+
+    Vector3[] directions = new Vector3[] // 육각형의 6방향으로 좌표를 이동하기 위한 벡터 배열
+{
+            new Vector3(-Mathf.Sqrt(3) / 2f, 0, 3f / 2f),
+            new Vector3(Mathf.Sqrt(3) / 2f, 0, 3f / 2f),
+            new Vector3(Mathf.Sqrt(3), 0, 0),
+            new Vector3(Mathf.Sqrt(3) / 2f, 0, -3f / 2f),
+            new Vector3(-Mathf.Sqrt(3) / 2f, 0, -3f / 2f),
+            new Vector3(-Mathf.Sqrt(3), 0, 0)
+};
 
     private static GridManager instance;
     public static GridManager Instance
@@ -112,34 +127,9 @@ public class GridManager : MonoBehaviour
         }
 
         Vertex originVertex = Grids.AddVertex(new Vector3(0, 0, 0)); // 육각형 그리드가 6방향으로 뻗어나갈 원점. 0, 0, 0을 원점으로 하였다.
-        CreateHexRecursion(4, originVertex);
+        CreateHexBFS(4, originVertex);
     }
-    public void CreateHexRecursion(int executionNumber, Vertex vertex) // 재귀를 통해 육각형 그리드를 그래프로서 생성. 이 그리드는 육각형 모양으로 커진다. executionNumber는 재귀 실행 횟수.
-    {
-        if (executionNumber <= 0)
-        {
-            return;
-        }
 
-        Vector3[] directions = new Vector3[] // 육각형의 6방향으로 좌표를 이동하기 위한 벡터 배열
-        {
-            new Vector3(-Mathf.Sqrt(3) / 2f, 0, 3f / 2f),
-            new Vector3(Mathf.Sqrt(3) / 2f, 0, 3f / 2f),
-            new Vector3(Mathf.Sqrt(3), 0, 0),
-            new Vector3(Mathf.Sqrt(3) / 2f, 0, -3f / 2f),
-            new Vector3(-Mathf.Sqrt(3) / 2f, 0, -3f / 2f),
-            new Vector3(-Mathf.Sqrt(3), 0, 0)
-        };
-
-        // 각 방향으로 새로운 정점을 추가하고 재귀 호출
-        foreach (var direction in directions)
-        {
-            Vector3 newCoord = vertex.Coordinate + direction;
-            Vertex newVertex = Grids.AddVertex(newCoord); // 중복된 좌표를 피하면서 정점을 추가
-            Grids.AddEdge(vertex, newVertex); // 정점 간 간선 추가
-            CreateHexRecursion(executionNumber - 1, newVertex); // 다음 단계로 재귀 호출
-        }
-    }
     public Vertex GetGridPosFromWorldPos(Vector3 worldPos) // 연산이 너무 많으니 추후 조정 예정
     {
         float distance = 0;
@@ -157,66 +147,154 @@ public class GridManager : MonoBehaviour
         }
         return closestVertex;
     }
-    public List<Vector3> GridVisualBFS(int prayRange, Vertex startVertex)
+    public void CreateHexBFS(int executionNumber, Vertex vertex) // BFS를 통해 육각형 그리드를 그래프로서 생성. 이 그리드는 육각형 모양으로 커진다. executionNumber는 재귀 실행 횟수.
     {
-        List<Vector3> vertices = new List<Vector3>();
-
-        //Queue<Vertex> queue = new Queue<Vertex>();
-        //startVertex.Visited = true;
-        //queue.Enqueue(startVertex);
-
-        //while (!(Vector3.Distance(queue.Peek().Coordinate, startVertex.Coordinate) > prayRange * Mathf.Sqrt(3))) // 큐를 Peek한 Vertex의 좌표와 시작 정점 좌표 거리를 구할 때, 기도 범위보다 크다면 반환
-        //{
-        //    Vertex vertex = queue.Dequeue();
-        //    vertices.Add(vertex.Coordinate);
-
-        //    foreach (Vertex v in Grids.Adjacencies[vertex])
-        //    {
-        //        if (!v.Visited)
-        //        {
-        //            v.Visited = true;;
-        //            queue.Enqueue(v);
-        //        }
-        //    }
-        //}
-        ////Grids.ClearVisited();
-
-        //return vertices;
-
-        vertices.Add(startVertex.Coordinate);
-        return vertices;
-    }
-    public Vertex FindTargetVertex(Vertex requesterVertex, string targetTag)
-    {
+        int depth = 0;
         Queue<Vertex> queue = new();
-        int distance;
+        HashSet<Vertex> visitedVertex = new();
+
+        queue.Enqueue(vertex);
+        visitedVertex.Add(vertex);
+
+        while (depth < executionNumber) // BFS는 좋은 해결책이 아니었던 것 같다. 가장 테두리의 그리드에는 정점이 연결되지 않아서 복잡한 로직으로 추가로 연결해야했다.
+        {
+            int levelSize = queue.Count;
+
+            for (int i = 0; i < levelSize; i++)
+            {
+                Vertex currentVertex = queue.Dequeue();
+
+                Vertex lastVertex = null;
+                Vertex firstVertex = null;
+                int count = 0;
+                foreach (var direction in directions)
+                {
+                    Vector3 newCoord = currentVertex.Coordinate + direction;
+                    Vertex newVertex = Grids.AddVertex(newCoord); // 중복된 좌표를 피하면서 정점을 추가
+                    Grids.AddEdge(currentVertex, newVertex); // 정점 간 간선 추가
+
+                    queue.Enqueue(newVertex);
+
+                    if (lastVertex == null)
+                    {
+                        firstVertex = newVertex;
+                    }
+                    if (lastVertex != null)
+                    {
+                        Grids.AddEdge(lastVertex, newVertex);
+                        count++;
+                    }
+                    if (count >= 5)
+                    {
+                        Grids.AddEdge(firstVertex, newVertex);
+                    }
+                    lastVertex = newVertex;
+                }
+            }
+
+            depth++;
+        }
+    }
+    public Vertex FindTargetVertex(Vertex requesterVertex, string targetTag, out int depth)
+    {
+        depth = 0;
+        Queue<Vertex> queue = new();
+        HashSet<Vertex> visitedVertex = new();
         Vertex targetVertex = null;
 
-        requesterVertex.Visited = true;
+        visitedVertex.Add(requesterVertex);
         queue.Enqueue(requesterVertex);
 
         while (queue.Count > 0)
         {
-            Vertex vertex = queue.Dequeue();
+            int levelSize = queue.Count;
 
-            if (vertex.AstralOnGrid.tag == targetTag)
+            for (int i = 0; i < levelSize; i++)
             {
-                targetVertex = vertex;
-                break;
-            }
-            else
-            {
-                foreach (Vertex adVertex in Grids.Adjacencies[vertex])
+                Vertex vertex = queue.Dequeue();
+
+                if (vertex.AstralOnGrid != null && vertex.AstralOnGrid.tag == targetTag)
                 {
-                    if (!adVertex.Visited)
+                    targetVertex = vertex;
+                    break;
+                }
+                else
+                {
+                    foreach (Vertex adVertex in Grids.Adjacencies[vertex])
                     {
-                        adVertex.Visited = true;
-                        queue.Enqueue(adVertex);
+                        if (!visitedVertex.Contains(adVertex))
+                        {
+                            queue.Enqueue(adVertex);
+                            visitedVertex.Add(adVertex);
+                        }
                     }
                 }
             }
+
+            if (targetVertex != null) // 이중 반복문이라 추가적인 break문이 필요했다.
+            {
+                break;
+            }
+
+            depth++;
         }
 
         return targetVertex;
     }
+
 }
+
+
+
+
+
+
+
+
+//public void CreateHexRecursion(int executionNumber, Vertex vertex) // 재귀를 통해 육각형 그리드를 그래프로서 생성. 이 그리드는 육각형 모양으로 커진다. executionNumber는 재귀 실행 횟수.
+//{
+//    if (executionNumber <= 0)
+//    {
+//        return;
+//    }
+
+//    // 각 방향으로 새로운 정점을 추가하고 재귀 호출
+//    foreach (var direction in directions)
+//    {
+//        Vector3 newCoord = vertex.Coordinate + direction;
+//        Vertex newVertex = Grids.AddVertex(newCoord); // 중복된 좌표를 피하면서 정점을 추가
+//        Grids.AddEdge(vertex, newVertex); // 정점 간 간선 추가
+//        CreateHexRecursion(executionNumber - 1, newVertex); // 다음 단계로 재귀 호출
+//    }
+//}
+
+
+//public List<Vector3> GridVisualBFS(int prayRange, Vertex startVertex)
+//{
+//    List<Vector3> vertices = new List<Vector3>();
+
+//    //Queue<Vertex> queue = new Queue<Vertex>();
+//    //startVertex.Visited = true;
+//    //queue.Enqueue(startVertex);
+
+//    //while (!(Vector3.Distance(queue.Peek().Coordinate, startVertex.Coordinate) > prayRange * Mathf.Sqrt(3))) // 큐를 Peek한 Vertex의 좌표와 시작 정점 좌표 거리를 구할 때, 기도 범위보다 크다면 반환
+//    //{
+//    //    Vertex vertex = queue.Dequeue();
+//    //    vertices.Add(vertex.Coordinate);
+
+//    //    foreach (Vertex v in Grids.Adjacencies[vertex])
+//    //    {
+//    //        if (!v.Visited)
+//    //        {
+//    //            v.Visited = true;;
+//    //            queue.Enqueue(v);
+//    //        }
+//    //    }
+//    //}
+//    ////Grids.ClearVisited();
+
+//    //return vertices;
+
+//    vertices.Add(startVertex.Coordinate);
+//    return vertices;
+//}

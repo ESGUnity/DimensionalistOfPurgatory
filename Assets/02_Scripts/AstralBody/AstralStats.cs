@@ -1,7 +1,8 @@
 using UnityEngine;
 
-public class AstralStats : MonoBehaviour
+public class AstralStats
 {
+    public CardData cardData;
     public int MaxHealth;
     public int CurrentHealth;
     public int MaxMana;
@@ -12,17 +13,15 @@ public class AstralStats : MonoBehaviour
     public int CurrentRitual;
     public int MaxCondition;
     public int CurrentCondition;
-    public CardData cardData;
+
 
     AstralBody astralBody;
 
-    private void Awake()
-    {
-        astralBody = GetComponent<AstralBody>();
-    }
-    public void SetAstralStats(CardData cardData)
+    public AstralStats(CardData cardData, AstralBody astralBody)
     {
         this.cardData = cardData;
+        this.astralBody = astralBody;
+
         MaxHealth = cardData.Health;
         CurrentHealth = MaxHealth;
         MaxMana = cardData.Mana;
@@ -34,6 +33,7 @@ public class AstralStats : MonoBehaviour
         MaxCondition = cardData.Condition;
         CurrentCondition = 0;
     }
+
 
     public void Damaged(int damage)
     {
