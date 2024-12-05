@@ -14,114 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardDataList:
   - <Id>k__BackingField: 10001
-    <Name>k__BackingField: "\uC544\uC787"
+    <Name>k__BackingField: "\uB098\uB9C9\uC2DC\uC2A4 \uC878\uAC1C"
     <Cost>k__BackingField: 1
-    <Ability>k__BackingField: 
+    <Ability>k__BackingField: '-'
     <Thumbnail>k__BackingField: {fileID: 0}
     <IsAstral>k__BackingField: 1
-    <Prefab>k__BackingField: {fileID: 1019634081241183354, guid: 0b57887f58b6b86498d7b703f48534ea, type: 3}
-    <Health>k__BackingField: 0
+    <Prefab>k__BackingField: {fileID: 1828410905731293595, guid: 3857460322175584d927ecde4b2a5b0a, type: 3}
+    <Health>k__BackingField: 200
     <Mana>k__BackingField: 0
-    <Damage>k__BackingField: 0
-    <Range>k__BackingField: 0
-    <Condition>k__BackingField: 0
-    <Ritual>k__BackingField: 0
-    <PrayRange>k__BackingField: 0
-  - <Id>k__BackingField: 20001
-    <Name>k__BackingField: "\uD638\uC694"
-    <Cost>k__BackingField: 2
-    <Ability>k__BackingField: 
-    <Thumbnail>k__BackingField: {fileID: 0}
-    <IsAstral>k__BackingField: 1
-    <Prefab>k__BackingField: {fileID: 1019634081241183354, guid: 0b57887f58b6b86498d7b703f48534ea, type: 3}
-    <Health>k__BackingField: 0
-    <Mana>k__BackingField: 0
-    <Damage>k__BackingField: 0
-    <Range>k__BackingField: 0
-    <Condition>k__BackingField: 0
-    <Ritual>k__BackingField: 0
-    <PrayRange>k__BackingField: 0
-  - <Id>k__BackingField: 30001
-    <Name>k__BackingField: "\uBC14\uBCA8"
-    <Cost>k__BackingField: 3
-    <Ability>k__BackingField: 
-    <Thumbnail>k__BackingField: {fileID: 0}
-    <IsAstral>k__BackingField: 1
-    <Prefab>k__BackingField: {fileID: 1019634081241183354, guid: 0b57887f58b6b86498d7b703f48534ea, type: 3}
-    <Health>k__BackingField: 0
-    <Mana>k__BackingField: 0
-    <Damage>k__BackingField: 0
-    <Range>k__BackingField: 0
+    <Damage>k__BackingField: 20
+    <Range>k__BackingField: 1
     <Condition>k__BackingField: 0
     <Ritual>k__BackingField: 0
     <PrayRange>k__BackingField: 0
   - <Id>k__BackingField: 10002
-    <Name>k__BackingField: "\uD328\uB4DC"
+    <Name>k__BackingField: "\uBA78\uD63C\uC790\uC758 \uC804\uB839"
     <Cost>k__BackingField: 1
-    <Ability>k__BackingField: 
-    <Thumbnail>k__BackingField: {fileID: 0}
-    <IsAstral>k__BackingField: 0
-    <Prefab>k__BackingField: {fileID: 0}
-    <Health>k__BackingField: 0
-    <Mana>k__BackingField: 0
-    <Damage>k__BackingField: 0
-    <Range>k__BackingField: 0
-    <Condition>k__BackingField: 0
-    <Ritual>k__BackingField: 0
-    <PrayRange>k__BackingField: 2
-  - <Id>k__BackingField: 20002
-    <Name>k__BackingField: "\uACF0"
-    <Cost>k__BackingField: 2
-    <Ability>k__BackingField: 
-    <Thumbnail>k__BackingField: {fileID: 0}
-    <IsAstral>k__BackingField: 0
-    <Prefab>k__BackingField: {fileID: 2066896392038628118, guid: 45288819fde2143449a96207b14db0bb, type: 3}
-    <Health>k__BackingField: 0
-    <Mana>k__BackingField: 0
-    <Damage>k__BackingField: 0
-    <Range>k__BackingField: 0
-    <Condition>k__BackingField: 0
-    <Ritual>k__BackingField: 0
-    <PrayRange>k__BackingField: 3
-  - <Id>k__BackingField: 20003
-    <Name>k__BackingField: "\uACF0\uACF0"
-    <Cost>k__BackingField: 2
-    <Ability>k__BackingField: 
+    <Ability>k__BackingField: "\uC18C\uBA78\uC758 \uBD80\uB984 : \uBB34\uC791\uC704
+      \uC801 \uC601\uCCB4 \uD558\uB098\uB97C 10\uD134 \uAC04 \uC1E0\uB77D\uC2DC\uD0B5\uB2C8\uB2E4."
     <Thumbnail>k__BackingField: {fileID: 0}
     <IsAstral>k__BackingField: 1
-    <Prefab>k__BackingField: {fileID: 1019634081241183354, guid: 0b57887f58b6b86498d7b703f48534ea, type: 3}
-    <Health>k__BackingField: 0
-    <Mana>k__BackingField: 0
-    <Damage>k__BackingField: 0
-    <Range>k__BackingField: 0
-    <Condition>k__BackingField: 0
-    <Ritual>k__BackingField: 0
-    <PrayRange>k__BackingField: 3
-  - <Id>k__BackingField: 40001
-    <Name>k__BackingField: "\uBB38"
-    <Cost>k__BackingField: 4
-    <Ability>k__BackingField: "\uC5F4\uB2E4"
-    <Thumbnail>k__BackingField: {fileID: 0}
-    <IsAstral>k__BackingField: 1
-    <Prefab>k__BackingField: {fileID: 1019634081241183354, guid: 0b57887f58b6b86498d7b703f48534ea, type: 3}
+    <Prefab>k__BackingField: {fileID: 3535569855271366589, guid: 1528d82b15ddc464a904e8a0fdf16da0, type: 3}
     <Health>k__BackingField: 100
-    <Mana>k__BackingField: 30
+    <Mana>k__BackingField: 0
     <Damage>k__BackingField: 10
-    <Range>k__BackingField: 1
-    <Condition>k__BackingField: 0
-    <Ritual>k__BackingField: 0
-    <PrayRange>k__BackingField: 0
-  - <Id>k__BackingField: 50001
-    <Name>k__BackingField: "\uBA15"
-    <Cost>k__BackingField: 5
-    <Ability>k__BackingField: "\uBB18\uBB18"
-    <Thumbnail>k__BackingField: {fileID: 0}
-    <IsAstral>k__BackingField: 1
-    <Prefab>k__BackingField: {fileID: 1019634081241183354, guid: 0b57887f58b6b86498d7b703f48534ea, type: 3}
-    <Health>k__BackingField: 100
-    <Mana>k__BackingField: 30
-    <Damage>k__BackingField: 10
-    <Range>k__BackingField: 1
+    <Range>k__BackingField: 2
     <Condition>k__BackingField: 0
     <Ritual>k__BackingField: 0
     <PrayRange>k__BackingField: 0

@@ -180,7 +180,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_sharedMaterial: {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -515,7 +516,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_sharedMaterial: {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -1065,6 +1067,7 @@ GameObject:
   - component: {fileID: 432152574}
   - component: {fileID: 432152573}
   - component: {fileID: 432152572}
+  - component: {fileID: 432152575}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1146,6 +1149,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &432152575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432152571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!1 &433031718
 GameObject:
   m_ObjectHideFlags: 0
@@ -2142,7 +2189,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 602787782}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a38e1b5b292e56a419882adb3c3f4ae0, type: 3}
+  m_Script: {fileID: 11500000, guid: 6fa9a871dd0e00143917a6da0eea3b10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mainCanvas: {fileID: 1019135552}
@@ -2581,7 +2628,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_sharedMaterial: {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -2717,7 +2765,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_sharedMaterial: {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -2889,7 +2938,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_sharedMaterial: {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -3100,7 +3150,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_sharedMaterial: {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -4217,7 +4268,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_sharedMaterial: {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -4576,7 +4628,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_sharedMaterial: {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -5028,7 +5081,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_sharedMaterial: {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: -3231896386632158047, guid: b148d193b3e7ee54f9fe8c6dbb9090d9, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:

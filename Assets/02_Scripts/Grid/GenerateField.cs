@@ -29,7 +29,7 @@ public class GenerateField : MonoBehaviour
                 }
             }
         }
-        else if (thisPlayerTag == "OpponentAI")
+        else if (thisPlayerTag == "Opponent")
         {
             foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
             {
@@ -55,7 +55,7 @@ public class GenerateField : MonoBehaviour
                 go.transform.position = vertex.Coordinate;
             }
         }
-        else if (thisPlayerTag == "OpponentAI")
+        else if (thisPlayerTag == "Opponent")
         {
             foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
             {

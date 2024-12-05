@@ -14,7 +14,6 @@ public class AstralStats
     public int MaxCondition;
     public int CurrentCondition;
 
-
     AstralBody astralBody;
 
     public AstralStats(CardData cardData, AstralBody astralBody)
@@ -35,14 +34,37 @@ public class AstralStats
     }
 
 
-    public void Damaged(int damage)
+    public void Damaged(int damage, int punishDamage = 0)
     {
-        CurrentHealth -= damage;
+        if (astralBody.astralStatusEffect.declainDuration > 0)
+        {
+            CurrentHealth -= damage * 2;
+        }
+        else
+        {
+            CurrentHealth -= damage;
+        }
+
         CurrentMana += 5; // 데미지를 입으면 5의 마나가 찬다.
+
+
+        if (astralBody.astralStatusEffect.punishDuration > 0 && CurrentHealth <= astralBody.astralStatusEffect.punishLimit)
+        {
+            astralBody.astralStatusEffect.DonePunish();
+            astralBody.DoDead();
+            return;
+        }
 
         if (CurrentHealth <= 0)
         {
+            astralBody.DoDead();
+            return;
+        }
 
+        if (CurrentHealth <= punishDamage)
+        {
+            astralBody.astralStatusEffect.DonePunish();
+            astralBody.DoDead();
         }
     }
 }

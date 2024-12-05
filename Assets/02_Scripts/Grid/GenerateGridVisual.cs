@@ -2,10 +2,11 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static UnityEditor.PlayerSettings;
 
 public class GenerateGridVisual : MonoBehaviour
 {
+    [SerializeField] TMP_Text temp;
+
     [SerializeField] GameObject YellowHexPrefab;
     [SerializeField] GameObject GreenHexPrefab;
     [SerializeField] GameObject RedHexPrefab;
@@ -62,6 +63,7 @@ public class GenerateGridVisual : MonoBehaviour
 
     private void Start()
     {
+        CreateHexMarkerGrid();
         CreateAstralGrid();
         CreatePrayGrid();
         CreateAstralIndicator();
@@ -91,7 +93,7 @@ public class GenerateGridVisual : MonoBehaviour
                 }
             }
         }
-        else if (thisPlayerTag == "OpponentAI")
+        else if (thisPlayerTag == "Opponent")
         {
             foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
             {
@@ -111,6 +113,17 @@ public class GenerateGridVisual : MonoBehaviour
             GameObject go = Instantiate(YellowHexPrefab);
             go.transform.position = vertex.Coordinate + new Vector3(0, 0.01f, 0);
             PrayGridList.Add(go);
+        }
+    }
+    void CreateHexMarkerGrid()
+    {
+        foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
+        {
+            GameObject go = Instantiate(YellowHexPrefab);
+            go.transform.position = vertex.Coordinate + new Vector3(0, 0.01f, 0);
+            GameObject temp = Instantiate(this.temp.gameObject);
+            temp.GetComponent<TMP_Text>().text = $"{vertex.Coordinate}";
+            temp.transform.position = vertex.Coordinate + new Vector3(0, 2f, 0);
         }
     }
     void CreateAstralIndicator()

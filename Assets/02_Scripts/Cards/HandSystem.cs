@@ -29,6 +29,8 @@ public class HandSystem : MonoBehaviour
     [SerializeField] RectTransform prayCardPosC;
     [SerializeField] GameObject BattleHand;
 
+    [SerializeField] TextMeshProUGUI remainCardsInDeck;
+
     Dictionary<RectTransform, GameObject> cardPosOnHand = new();
     Dictionary<RectTransform, GameObject> prayCardPosOnHand = new();
     string thisPlayerTag;
@@ -85,6 +87,8 @@ public class HandSystem : MonoBehaviour
             PutOutCardInPreparation();
             PutOutCardInBattle();
         }
+
+        remainCardsInDeck.text = $"{CardManager.Instance.CountDeck(thisPlayerTag)} / 25";
     }
 
     
