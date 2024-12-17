@@ -136,7 +136,7 @@ Material:
     - _FadeScrollYSpeed: 0
     - _FadeTransition: 0.075
     - _Glow: 0
-    - _GlowGlobal: 7.84
+    - _GlowGlobal: 3
     - _HandDrawnAmount: 10
     - _HandDrawnSpeed: 5
     - _HsvBright: 1
@@ -237,11 +237,11 @@ Material:
     - _DepthGlowColor: {r: 1, g: 1, b: 1, a: 1}
     - _FadeBurnColor: {r: 1, g: 1, b: 0, a: 1}
     - _FrontFaceTint: {r: 1, g: 1, b: 1, a: 1}
-    - _GlowColor: {r: 1, g: 1, b: 1, a: 1}
+    - _GlowColor: {r: 1, g: 0.8891432, b: 0.495283, a: 1}
     - _LightColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _Shape2Color: {r: 1, g: 0.5869599, b: 0, a: 1}
     - _Shape3Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ShapeColor: {r: 2.2264152, g: 0.7997482, b: 0.07351375, a: 1}
+    - _ShapeColor: {r: 2.2264154, g: 1.8993617, b: 0.081596404, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

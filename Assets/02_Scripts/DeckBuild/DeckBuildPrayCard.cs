@@ -1,5 +1,3 @@
-using System.Xml.Linq;
-using UnityEditor.Playables;
 using UnityEngine;
 
 public class DeckBuildPrayCard : DeckBuildInteractableCard

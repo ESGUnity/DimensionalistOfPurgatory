@@ -23,7 +23,9 @@ public class DeckBuildManager : MonoBehaviour
     [SerializeField] GameObject namePlatePrefab;
     [SerializeField] TextMeshProUGUI warningMessage;
     [SerializeField] GameObject suggestSaveDeckMessageBox;
-    [SerializeField] TextMeshProUGUI deckName;
+    [SerializeField] TextMeshProUGUI deckNameInputField;
+    [SerializeField] TextMeshProUGUI deckNameText;
+    [SerializeField] TextMeshProUGUI currentCardCountText;
 
     [SerializeField] GameObject viewMyAllCardsScreen;
     [SerializeField] Transform viewMyAllCardsContent;
@@ -35,6 +37,7 @@ public class DeckBuildManager : MonoBehaviour
     GameObject repositionedCard;
     Coroutine CurrentAlramDeckSaved;
     Coroutine CurrentWarningAlreadyDeckMax;
+    IDeck currentBuildingDeck;
 
     private static DeckBuildManager instance;
     public static DeckBuildManager Instance {  get { return instance; } }
@@ -45,6 +48,14 @@ public class DeckBuildManager : MonoBehaviour
         deckBuildScreenRaycaster = mainCanvas.GetComponent<GraphicRaycaster>();
     }
 
+    private void Update()
+    {
+        if (currentBuildingDeck != null)
+        {
+            currentBuildingDeck.DeckCount = selectedDeckCardId.Count;
+            currentCardCountText.text = $"{currentBuildingDeck.DeckCount} / 25";
+        }
+    }
     public void StartViewMyCards()
     {
         viewMyAllCardsScreen.SetActive(true);
@@ -54,21 +65,24 @@ public class DeckBuildManager : MonoBehaviour
             GameObject go = card.IsAstral ? Instantiate(astralPrefab) : Instantiate(prayPrefab); // 카드가 영체인지 기도인지 확인하고 각 타입에 맞는 프리팹을 생성.
             go.GetComponent<DeckBuildInteractableCard>().SetupCardData(card);
             go.GetComponent<DeckBuildInteractableCard>().IsViewOnly = true;
-            go.transform.SetParent(viewMyAllCardsContent);
+            go.transform.SetParent(viewMyAllCardsContent, false);
         }
 
         SortWholeCardContent(viewMyAllCardsContent);
     }
-    public void StartDeckBuild(int deckNumber) // 덱 빌드 화면 세팅
+    public void StartDeckBuild(IDeck deck) // 덱 빌드 화면 세팅
     {
+        currentBuildingDeck = deck;
+
         deckBuildScreen.SetActive(true); // 덱 빌드 화면 띄우기
         FillWholeCardContent(); // 보유한 카드(현재는 카드 전체 다 줌) 목록 띄우기
 
-        this.deckNumber = deckNumber; // 덱 넘버 설정
+        deckNumber = deck.DeckNumber; // 덱 넘버 설정
         selectedDeckCardId = LoadDeckInLocal(deckNumber); // 덱 불러오기
         FillDeckNamePlateContent(selectedDeckCardId); // 불러온 덱으로 덱 리스트 채우기
 
-        deckName.text = $"{deckNumber}번 덱";
+        deckNameInputField.text = deck.DeckName;
+        deckNameText.text = deck.DeckName;
         warningMessage.gameObject.SetActive(false); // 알림 메시지 비활성화
     }
     void FillWholeCardContent() // 보유 중인 카드 목록
@@ -78,6 +92,8 @@ public class DeckBuildManager : MonoBehaviour
             GameObject go = card.IsAstral ? Instantiate(astralPrefab) : Instantiate(prayPrefab); // 카드가 영체인지 기도인지 확인하고 각 타입에 맞는 프리팹을 생성.
             go.GetComponent<DeckBuildInteractableCard>().SetupCardData(card);
             go.transform.SetParent(wholeCardContent);
+            go.transform.localScale = Vector3.one;
+            go.transform.localPosition = new Vector3(go.transform.localPosition.x, go.transform.localPosition.y, 0f);
         }
 
         SortWholeCardContent(wholeCardContent);
@@ -92,6 +108,8 @@ public class DeckBuildManager : MonoBehaviour
                 GameObject go = Instantiate(namePlatePrefab);
                 go.GetComponent<DeckBuildNamePlate>().SetCardInfo(selectedCardData);
                 go.transform.SetParent(deckNamePlateContent);
+                go.transform.localScale = Vector3.one;
+                go.transform.localPosition = new Vector3(go.transform.localPosition.x, go.transform.localPosition.y, 0f);
             }
         }
         SortDeckContent();
@@ -104,12 +122,18 @@ public class DeckBuildManager : MonoBehaviour
         repositionedCard = cardData.IsAstral ? Instantiate(astralPrefab) : Instantiate(prayPrefab);
         repositionedCard.GetComponent<DeckBuildInteractableCard>().SetupCardData(cardData);
         repositionedCard.transform.SetParent(deckBuildScreen.transform);
+        repositionedCard.transform.localScale = Vector3.one;
+        repositionedCard.transform.localPosition = new Vector3(repositionedCard.transform.localPosition.x, repositionedCard.transform.localPosition.y, 0f);
     } // 카드 이동 시작
     public void OnRepositionCard()
     {
         if (repositionedCard != null)
         {
-            repositionedCard.transform.position = Input.mousePosition;
+            Vector3 worldPosition;
+            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(mainCanvas.GetComponent<RectTransform>(), Input.mousePosition, Camera.main, out worldPosition))
+            {
+                repositionedCard.transform.position = worldPosition;
+            }
         }
     } // 카드 이동 중
     public void StopRepositionCard(GameObject prefab) // 카드 이동 종료. DeckContent 위에서 마우스를 뗐다면 덱에 저장
@@ -158,6 +182,8 @@ public class DeckBuildManager : MonoBehaviour
                 GameObject go = Instantiate(namePlatePrefab);
                 go.GetComponent<DeckBuildNamePlate>().SetCardInfo(repositionedCard.GetComponent<DeckBuildInteractableCard>().cardData);
                 go.transform.SetParent(deckNamePlateContent);
+                go.transform.localScale = Vector3.one;
+                go.transform.localPosition = new Vector3(go.transform.localPosition.x, go.transform.localPosition.y, 0f);
                 SortDeckContent();
             }
         }
@@ -308,13 +334,17 @@ public class DeckBuildManager : MonoBehaviour
     public void SaveDeckAndTerminateDeckBuildScreen()
     {
         SaveDeckInLocal(deckNumber);
+        currentBuildingDeck.SaveDeckInfo();
+        currentBuildingDeck.SetDeckInfo();
         TerminateDeckBuildScreen();
     }
     public void OnClickSaveDeck()
     {
         SaveDeckInLocal(deckNumber);
+        currentBuildingDeck.SaveDeckInfo();
+        currentBuildingDeck.SetDeckInfo();
 
-        if (CurrentAlramDeckSaved == null)
+        if (CurrentAlramDeckSaved == null) // 덱이 저장됨을 알려주는 텍스트
         {
             CurrentAlramDeckSaved = StartCoroutine(AlramDeckSaved());
         }
@@ -340,14 +370,20 @@ public class DeckBuildManager : MonoBehaviour
 
         viewMyAllCardsScreen.SetActive(false);
     }
-
+    public void OnClickDeckNameChange()
+    {
+        currentBuildingDeck.DeckName = deckNameInputField.text;
+        currentBuildingDeck.SaveDeckInfo();
+        currentBuildingDeck.SetDeckInfo();
+        deckNameText.text = currentBuildingDeck.DeckName;
+    }
 
 
     // 코루틴 모음
     IEnumerator WarningAlreadyDeckMax()
     {
         warningMessage.gameObject.SetActive(true);
-        warningMessage.text = "덱의 카드가 이미 최대 장수인 25장에 도달했습니다.";
+        warningMessage.text = "덱의 카드가 이미 최대 장수인 25장에 도달했습니다";
 
         yield return new WaitForSeconds(3f);
 
@@ -357,7 +393,7 @@ public class DeckBuildManager : MonoBehaviour
     IEnumerator AlramDeckSaved()
     {
         warningMessage.gameObject.SetActive(true);
-        warningMessage.text = $"덱을 저장했습니다.\n덱 이름 : {deckNumber}번 덱";
+        warningMessage.text = $"덱을 저장했습니다";
 
         yield return new WaitForSeconds(3f);
 

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class A10002 : AstralBody
 {
-    public override void SetProjectileAndAbilityVFXAndObserving()
+    public override void AssignProjectile()
     {
         projectile = AstralVFXManager.Instance.P10002;
     }

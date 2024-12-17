@@ -1,27 +1,32 @@
 using DG.Tweening;
+using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+
+public enum State
+{
+    Live,
+    Dead
+}
 
 public class AstralBody : MonoBehaviour
 {
     [HideInInspector] public GameObject projectile;
-    CardData cardData;
+    [HideInInspector] public CardData cardData;
     [HideInInspector] public AstralStats astralStats;
-    AstralAnimStateMachine astralAnimStateMachine;
+    [HideInInspector] public AstralAnimStateMachine astralAnimStateMachine;
     [HideInInspector] public AstralStatusEffect astralStatusEffect;
 
     [HideInInspector] public Vertex thisGridVertex;
     Vertex targetEnemyGridVertex;
     [HideInInspector] public string masterPlayerTag;
     string opponentTag;
+    [HideInInspector] public State state;
+    [HideInInspector] public bool IsSpawned = false;
 
     private void Awake()
     {
-        
-    }
-    private void OnEnable()
-    {
-
+        state = State.Live;
     }
     private void OnDisable()
     {
@@ -34,13 +39,9 @@ public class AstralBody : MonoBehaviour
             PhaseManager.Instance.OpponentBattleTurn -= SelectAction;
         }
     }
-    void Start()
-    {
-        SetProjectileAndAbilityVFXAndObserving();
-    }
     private void Update()
     {
-        
+        if (IsSpawned && PhaseManager.Instance.CurrentPhase == Phase.AfterBattle) { DoDead(); } // 만약 스폰된 녀석이라면 전투가 끝나면 파괴.
     }
     public void SetAstralInfo(Vertex thisGridVertex, CardData cardData, string thisPlayerTag)
     {
@@ -53,7 +54,7 @@ public class AstralBody : MonoBehaviour
         masterPlayerTag = thisPlayerTag; // 영체 주인의 태그 설정
         gameObject.tag = masterPlayerTag; // 자기 자신의 태그 설정
 
-        if (masterPlayerTag == "Player")
+        if (masterPlayerTag == "Player") // 마스터 플레이어에 따라 태그 설정
         {
             opponentTag = "Opponent";
         }
@@ -67,7 +68,7 @@ public class AstralBody : MonoBehaviour
         astralAnimStateMachine = new AstralAnimStateMachine(GetComponent<Animator>()); // 영체 애님스테이트 할당
         astralStatusEffect = GetComponent<AstralStatusEffect>();
 
-        if (masterPlayerTag == "Player")
+        if (masterPlayerTag == "Player") // PhaseManager의 영체 행동 턴 구독
         {
             PhaseManager.Instance.PlayerBattleTurn += SelectAction;
         }
@@ -75,10 +76,18 @@ public class AstralBody : MonoBehaviour
         {
             PhaseManager.Instance.OpponentBattleTurn += SelectAction;
         }
+
+        UIManager.Instance.GenerateAstralUI(gameObject);
+
+        SubcribeCondition();
+        AssignProjectile();
     }
-    public void SelectAction() // 행동의 우선순위!
+    public void SelectAction() // 행동의 우선순위에 따라서 행동을 정한다.
     {
+        if (state == State.Dead) { return; } // 만약 죽었는데 행동하려하면 즉시 리턴 (안전장치)
+
         int distance = SetTargetAndGetDistance();
+
         if (targetEnemyGridVertex == null) // 만약 적이 없는데 SelectAction이 호출되었다면 즉시 리턴 (안전장치)
         {
             DoIdle();
@@ -108,13 +117,13 @@ public class AstralBody : MonoBehaviour
             return;
         }
 
-        if (astralStats.MaxMana != 0 && astralStats.CurrentMana == astralStats.MaxMana && astralStatusEffect.sealDuration <= 0) // 마나 충족 시 능력 시전
+        if (astralStats.MaxMana != 0 && astralStats.CurrentMana >= astralStats.MaxMana && astralStatusEffect.sealDuration <= 0) // 마나 충족 시 능력 시전
         {
             DoManaAbility();
             return;
         }
 
-        if (astralStats.MaxCondition != 0 && astralStats.CurrentCondition == astralStats.MaxCondition && astralStatusEffect.sealDuration <= 0)
+        if (astralStats.MaxCondition != 0 && astralStats.CurrentCondition >= astralStats.MaxCondition && astralStatusEffect.sealDuration <= 0)
         {
             DoConditionAbility();
             return;
@@ -156,14 +165,14 @@ public class AstralBody : MonoBehaviour
     }
     void DoManaAbility()
     {
-        ManaAbility();
         astralStats.CurrentMana = 0;
+        ManaAbility();
         astralAnimStateMachine.OnManaAbility();
     }
     void DoConditionAbility()
     {
-        ConditionAbility();
         astralStats.CurrentCondition = 0;
+        ConditionAbility();
         astralAnimStateMachine.OnConditionAbility();
     }
     void DoMeleeAttack()
@@ -182,27 +191,28 @@ public class AstralBody : MonoBehaviour
     }
     void DoMove()
     {
-        if (GridManager.Instance.Grids.Vertices.Contains(thisGridVertex))
-        {
-            thisGridVertex.Alram();
-        }
-
         Vertex MoveVertex = GridManager.Instance.DecideNextMoveVertex(thisGridVertex, targetEnemyGridVertex);
-        MoveVertex.AstralOnGrid = gameObject;
-        thisGridVertex.AstralOnGrid = null;
-        thisGridVertex = MoveVertex;
+        if (MoveVertex == null || MoveVertex == thisGridVertex)
+        {
+            return;
+        }
+        else
+        {
+            MoveVertex.AstralOnGrid = gameObject;
+            thisGridVertex.AstralOnGrid = null;
+            thisGridVertex = MoveVertex;
+        }
 
         transform.DOMove(MoveVertex.Coordinate, 1f / astralAnimStateMachine.moveAnimationClipLength).SetEase(Ease.Linear);
         astralAnimStateMachine.OnMove();
         transform.LookAt(MoveVertex.Coordinate);
-
-        if (GridManager.Instance.Grids.Vertices.Contains(thisGridVertex))
-        {
-            thisGridVertex.Alram();
-        }
     }
     public void DoDead()
     {
+        state = State.Dead;
+
+        UnsubscribeCondition();
+
         if (astralStatusEffect.sealDuration <= 0)
         {
             DeadAbility();
@@ -211,7 +221,7 @@ public class AstralBody : MonoBehaviour
         astralStatusEffect.DoneSlain();
 
         PhaseManager.Instance.phaseStorageBattleInfo.RemoveAstralInList(gameObject);
-        Destroy(gameObject, 0.2f);
+        Destroy(gameObject, 0.05f);
     }
     public virtual void ManaAbility()
     {
@@ -222,7 +232,6 @@ public class AstralBody : MonoBehaviour
     {
 
     }
-    // 소멸의 부름이 없더라도 만약 구독을 했다면 이를 오버라이드해서 구독 해제하기
     public virtual void DeadAbility()
     {
 
@@ -231,29 +240,76 @@ public class AstralBody : MonoBehaviour
 
 
 
-    // 영체 생산 시 사거리가 2 이상이거나 고유 능력에 VFX가 있다면 반드시 오버라이드할 것.
-    // 조건이 필요하다면 구독도 하기
-    public virtual void SetProjectileAndAbilityVFXAndObserving()
+    public virtual void AssignProjectile() // 프로젝타일 할당(사거리 2이상 영체 해당)
     {
 
     }
-
-    public void SetAstralActionTurnForAbility(GameObject VFX)
+    public virtual void SubcribeCondition() // 조건 구독(조건 영체 해당)
     {
-        PhaseManager.Instance.SetAstralActionTerm(VFX.GetComponent<Animator>().runtimeAnimatorController.animationClips[0].length);
+
+    }
+    public virtual void UnsubscribeCondition() // 조건 구독 해제(조건 영체 해당)
+    {
+
+    }
+    public virtual void AddCondition() // 조건 충족 시 CurrentCondition++(조건 영체 해당)
+    {
+        if (astralStats != null) // 안전장치!!!
+        {
+            astralStats.CurrentCondition++;
+        }
+    }
+    public void SetAbilityTimeToAstralTurn(GameObject VFX)
+    {
+        PhaseManager.Instance.SetAstralActionTerm(GetVFXLength(VFX) + 0.1f);
+    }
+    public void AutoDestroyVFX(GameObject VFX)
+    {
+        Destroy(VFX, GetVFXLength(VFX));
+    }
+    public float GetVFXLength(GameObject VFX)
+    {
+        return VFX.GetComponent<Animator>().runtimeAnimatorController.animationClips[0].length;
+    }
+    public void SetAbilityTimeToAstralTurnInChild(GameObject VFX) // Position이 움직이는 애니메이션 때문에 추가함.
+    {
+        PhaseManager.Instance.SetAstralActionTerm(GetVFXLengthInChild(VFX) + 0.1f);
+    }
+    public void AutoDestroyVFXInChild(GameObject VFX)
+    {
+        Destroy(VFX, GetVFXLengthInChild(VFX));
+    }
+    public float GetVFXLengthInChild(GameObject VFX)
+    {
+        return VFX.GetComponentInChildren<Animator>().runtimeAnimatorController.animationClips[0].length;
     }
 
     IEnumerator MeleeCoroutine()
     {
         yield return new WaitForSeconds((1f / astralAnimStateMachine.attackAnimationClipLength) / 2f);
+        if (targetEnemyGridVertex.AstralOnGrid != null)
+        {
+            targetEnemyGridVertex.AstralOnGrid.GetComponent<AstralBody>().astralStats.Damaged(astralStats.Damage);
 
-        targetEnemyGridVertex.AstralOnGrid.GetComponent<AstralBody>().astralStats.Damaged(astralStats.Damage);
+            if (astralStats != null && astralStats.MaxMana != 0)
+            {
+                astralStats.CurrentMana += 10;
+            }
+        }
     }
 
     IEnumerator RangeCoroutine()
     {
         yield return new WaitForSeconds((1f / astralAnimStateMachine.attackAnimationClipLength) / 2f);
 
-        Instantiate(projectile).GetComponent<AstralProjectile>().SetTarget(targetEnemyGridVertex.AstralOnGrid, this);
+        if (targetEnemyGridVertex.AstralOnGrid != null)
+        {
+            Instantiate(projectile).GetComponent<AstralProjectile>().SetTarget(targetEnemyGridVertex.AstralOnGrid, this);
+
+            if (astralStats != null && astralStats.MaxMana != 0)
+            {
+                astralStats.CurrentMana += 10;
+            }
+        }
     }
 }

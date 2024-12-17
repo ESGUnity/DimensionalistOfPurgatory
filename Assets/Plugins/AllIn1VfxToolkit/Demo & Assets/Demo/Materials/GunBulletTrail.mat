@@ -209,7 +209,7 @@ Material:
     - _TextureScrollXSpeed: 1
     - _TextureScrollYSpeed: 0
     - _TimingSeed: 0
-    - _TrailWidthPower: 1
+    - _TrailWidthPower: 2
     - _TwistUvAmount: 1
     - _TwistUvPosX: 0.5
     - _TwistUvPosY: 0.5

@@ -6,10 +6,10 @@ public class AstralAnimStateMachine
 
     public float attackAnimationClipLength;
     public float moveAnimationClipLength;
-    float ritualAnimationClipLength;
-    float manaAbilityAnimationClipLength;
-    float conditionAbilityAnimationClipLength;
-    float deadAbilityAnimationClipLength;
+    public float ritualAnimationClipLength;
+    public float manaAbilityAnimationClipLength;
+    public float conditionAbilityAnimationClipLength;
+    public float deadAbilityAnimationClipLength;
 
     public AstralAnimStateMachine(Animator animator)
     {
@@ -21,12 +21,12 @@ public class AstralAnimStateMachine
     public void NormalizeAllAnimationClip()
     {
 
-        attackAnimationClipLength = 1f;
-        moveAnimationClipLength = 1.5f; // 0.6667초
-        ritualAnimationClipLength = 0.7f; // 1.4286초
-        manaAbilityAnimationClipLength = 0.5f; // 2초
-        conditionAbilityAnimationClipLength = 0.5f; // 2초
-        deadAbilityAnimationClipLength = 0.5f; // 2초
+        attackAnimationClipLength = 1.5f; // 0.666초
+        moveAnimationClipLength = 1.5f; // 0.666초
+        ritualAnimationClipLength = 0.6f; // 1.25초
+        manaAbilityAnimationClipLength = 0.6f; // 1.25초
+        conditionAbilityAnimationClipLength = 0.6f; // 1.25초
+        deadAbilityAnimationClipLength = 0.6f; // 1.25초
 
         RuntimeAnimatorController controller = animator.runtimeAnimatorController;
         AnimationClip[] clips = controller.animationClips;
@@ -63,31 +63,31 @@ public class AstralAnimStateMachine
     public void OnAttack()
     {
         animator.SetTrigger("Attack");
-        PhaseManager.Instance.SetAstralActionTerm(1f / attackAnimationClipLength + 0.2f); // 영체의 한 턴의 길이를 애니메이션 클립 길이로 설정
+        PhaseManager.Instance.SetAstralActionTerm(1f / attackAnimationClipLength + 0.1f); // 영체의 한 턴의 길이를 애니메이션 클립 길이로 설정
     }
     public void OnMove()
     {
         animator.SetTrigger("Move");
-        PhaseManager.Instance.SetAstralActionTerm(1f / moveAnimationClipLength + 0.2f);
+        PhaseManager.Instance.SetAstralActionTerm(1f / moveAnimationClipLength + 0.1f);
     }
     public void OnRitual()
     {
         animator.SetTrigger("Ritual");
-        PhaseManager.Instance.SetAstralActionTerm(1f / ritualAnimationClipLength + 0.2f);
+        PhaseManager.Instance.SetAstralActionTerm(1f / ritualAnimationClipLength + 0.1f);
     }
     public void OnManaAbility()
     {
         animator.SetTrigger("ManaAbility");
-        PhaseManager.Instance.SetAstralActionTerm(1f / manaAbilityAnimationClipLength + 0.2f);
+        PhaseManager.Instance.SetAstralActionTerm(1f / manaAbilityAnimationClipLength + 0.1f);
     }
     public void OnConditionAbility()
     {
         animator.SetTrigger("ConditionAbility");
-        PhaseManager.Instance.SetAstralActionTerm(1f / conditionAbilityAnimationClipLength + 0.2f);
+        PhaseManager.Instance.SetAstralActionTerm(1f / conditionAbilityAnimationClipLength + 0.1f);
     }
     public void OnDeadAbility()
     {
         animator.SetTrigger("DeadAbility");
-        PhaseManager.Instance.SetAstralActionTerm(1f / deadAbilityAnimationClipLength + 0.2f);
+        PhaseManager.Instance.SetAstralActionTerm(1f / deadAbilityAnimationClipLength + 0.1f);
     }
 }

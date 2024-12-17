@@ -5,8 +5,7 @@ using UnityEngine.UIElements;
 
 public class GenerateGridVisual : MonoBehaviour
 {
-    [SerializeField] TMP_Text temp;
-
+    [SerializeField] GameObject DefaultHexPrefab;
     [SerializeField] GameObject YellowHexPrefab;
     [SerializeField] GameObject GreenHexPrefab;
     [SerializeField] GameObject RedHexPrefab;
@@ -17,11 +16,12 @@ public class GenerateGridVisual : MonoBehaviour
     Dictionary<Vector3, GameObject> WholeGridList = new();
     GameObject greenAstralIndicator;
     GameObject redAstralIndicator;
+    TMP_Text prayPledgeAvailableText;
     string thisPlayerTag;
-    [SerializeField] Vector3 gridPosition;
+    Vector3 gridPosition;
     Vector3 mousePosition;
     Vertex gridVertex;
-    [SerializeField] Vector3 lastPosition;
+    Vector3 lastPosition;
     Vector3[] prayRange2 = new Vector3[]
     {
         new Vector3(0, 0, 0),
@@ -63,7 +63,7 @@ public class GenerateGridVisual : MonoBehaviour
 
     private void Start()
     {
-        CreateHexMarkerGrid();
+        CreateDefaultGrid();
         CreateAstralGrid();
         CreatePrayGrid();
         CreateAstralIndicator();
@@ -71,6 +71,9 @@ public class GenerateGridVisual : MonoBehaviour
 
         OnAstralGridVisual(false);
         OnPrayGridVisual(false);
+
+        prayPledgeAvailableText = Instantiate(PrayPledgeAvailableText);
+        prayPledgeAvailableText.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -115,15 +118,12 @@ public class GenerateGridVisual : MonoBehaviour
             PrayGridList.Add(go);
         }
     }
-    void CreateHexMarkerGrid()
+    void CreateDefaultGrid()
     {
         foreach (Vertex vertex in GridManager.Instance.Grids.Vertices)
         {
-            GameObject go = Instantiate(YellowHexPrefab);
-            go.transform.position = vertex.Coordinate + new Vector3(0, 0.01f, 0);
-            GameObject temp = Instantiate(this.temp.gameObject);
-            temp.GetComponent<TMP_Text>().text = $"{vertex.Coordinate}";
-            temp.transform.position = vertex.Coordinate + new Vector3(0, 2f, 0);
+            GameObject go = Instantiate(DefaultHexPrefab);
+            go.transform.position = vertex.Coordinate + new Vector3(0, 0.008f, 0);
         }
     }
     void CreateAstralIndicator()
@@ -210,7 +210,7 @@ public class GenerateGridVisual : MonoBehaviour
             redAstralIndicator.SetActive(false);
         }
     }
-    public void OnPrayRangeIndicator(bool turnOn, int prayRange)
+    public void OnPrayRangeIndicator(bool turnOn, int prayRange, bool isCast)
     {
         mousePosition = GetComponent<InputSystem>().GetMousePositionOnField();
         float epsilon = 0.001f;
@@ -295,12 +295,21 @@ public class GenerateGridVisual : MonoBehaviour
                                 }
                             }
                             break;
+                        case 0:
+                            foreach (Vector3 pos in WholeGridList.Keys)
+                            {
+                                WholeGridList[pos].SetActive(true);
+                            }
+                            break;
                     }
 
-                    PrayPledgeAvailableText.gameObject.SetActive(true);
-                    PrayPledgeAvailableText.text = "기도 서약하기";
-                    PrayPledgeAvailableText.gameObject.transform.position = gridPosition + new Vector3(0, 1f, 0);
-                    PrayPledgeAvailableText.gameObject.transform.LookAt(PrayPledgeAvailableText.gameObject.transform.position + GetComponent<InputSystem>().PlayerCamera.transform.forward);
+                    if (!isCast)
+                    {
+                        prayPledgeAvailableText.gameObject.SetActive(true);
+                        prayPledgeAvailableText.text = "기도 서약하기";
+                        prayPledgeAvailableText.gameObject.transform.position = gridPosition + new Vector3(0, 1f, 0);
+                        prayPledgeAvailableText.gameObject.transform.LookAt(prayPledgeAvailableText.gameObject.transform.position + GetComponent<InputSystem>().PlayerCamera.transform.forward);
+                    }
                 }
                 else
                 {
@@ -309,7 +318,7 @@ public class GenerateGridVisual : MonoBehaviour
                         WholeGridList[pos].SetActive(false);
                     }
 
-                    PrayPledgeAvailableText.gameObject.SetActive(false);
+                    prayPledgeAvailableText.gameObject.SetActive(false);
                 }
             }
             else if (!GetComponent<InputSystem>().CanPlacement())
@@ -321,7 +330,7 @@ public class GenerateGridVisual : MonoBehaviour
 
                 lastPosition = new Vector3(0, 0, 0);
 
-                PrayPledgeAvailableText.gameObject.SetActive(false);
+                prayPledgeAvailableText.gameObject.SetActive(false);
             }
             else
             {
@@ -335,7 +344,7 @@ public class GenerateGridVisual : MonoBehaviour
                 WholeGridList[pos].SetActive(false);
             }
 
-            PrayPledgeAvailableText.gameObject.SetActive(false);
+            prayPledgeAvailableText.gameObject.SetActive(false);
         }
     }
 }

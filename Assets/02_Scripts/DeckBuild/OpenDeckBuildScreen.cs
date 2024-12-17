@@ -1,10 +1,17 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class OpenDeckBuildScreen : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
 {
-    [SerializeField] int deckNumber;
-
+    private void Start()
+    {
+        GetComponent<IDeck>().SetDeckInfo();
+    }
+    private void Update()
+    {
+        transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = GetComponent<IDeck>().DeckName;
+    }
     public void OnPointerEnter(PointerEventData eventData)
     {
         // ½¦ÀÌ´õ È¿°ú
@@ -16,7 +23,7 @@ public class OpenDeckBuildScreen : MonoBehaviour, IPointerEnterHandler, IPointer
     }
     public void OnPointerDown(PointerEventData eventData)
     {
-        DeckBuildManager.Instance.GetComponent<DeckBuildManager>().StartDeckBuild(deckNumber);
+        DeckBuildManager.Instance.StartDeckBuild(GetComponent<IDeck>());
     }
 
     public void OnPointerUp(PointerEventData eventData)

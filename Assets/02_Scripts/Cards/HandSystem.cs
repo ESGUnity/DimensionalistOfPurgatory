@@ -29,12 +29,16 @@ public class HandSystem : MonoBehaviour
     [SerializeField] RectTransform prayCardPosC;
     [SerializeField] GameObject BattleHand;
 
-    [SerializeField] TextMeshProUGUI remainCardsInDeck;
+    [SerializeField] TextMeshProUGUI remainCardsInDeckText;
+    [SerializeField] TextMeshProUGUI deckFillNotifierText;
+    [SerializeField] GameObject bringerDialogue;
+
 
     Dictionary<RectTransform, GameObject> cardPosOnHand = new();
     Dictionary<RectTransform, GameObject> prayCardPosOnHand = new();
     string thisPlayerTag;
     Vector3 sizeWhenPressed = new Vector3(0.5f, 0.5f, 0.5f);
+    Coroutine deckFillNotifierCoroutine;
 
     private void Awake()
     {
@@ -55,12 +59,12 @@ public class HandSystem : MonoBehaviour
     private void OnEnable()
     {
         PhaseManager.Instance.OnAfterPreparation += SwapHandToBattle;
-        PhaseManager.Instance.OnAfterBattle += SwapHandToPreparation;
+        PhaseManager.Instance.OnPreparation += SwapHandToPreparation;
     }
     private void OnDisable()
     {
         PhaseManager.Instance.OnAfterPreparation -= SwapHandToBattle;
-        PhaseManager.Instance.OnAfterBattle -= SwapHandToPreparation;
+        PhaseManager.Instance.OnPreparation -= SwapHandToPreparation;
     }
     void Start()
     {
@@ -69,9 +73,19 @@ public class HandSystem : MonoBehaviour
 
     void Update()
     {
-        if (CardManager.Instance.CountDeck(thisPlayerTag) <= 0 && !(PhaseManager.Instance.CurrentPhase == Phase.Preparation))  
+        if (CardManager.Instance.CountDeck(thisPlayerTag) <= 0)  // && !(PhaseManager.Instance.CurrentPhase == Phase.Preparation)
         {
-            CardManager.Instance.FillDeck(thisPlayerTag);
+            CardManager.Instance.FillDeck(thisPlayerTag); 
+
+            if (deckFillNotifierCoroutine == null) // 덱을 채울 때마다 알려준다.
+            {
+                deckFillNotifierCoroutine = StartCoroutine(NotifyDeckFilled());
+            }
+            else
+            {
+                StopCoroutine(deckFillNotifierCoroutine);
+                deckFillNotifierCoroutine = StartCoroutine(NotifyDeckFilled());
+            }
         }
 
         ImportDrawCardToHand();
@@ -79,8 +93,9 @@ public class HandSystem : MonoBehaviour
         if (PhaseManager.Instance.CurrentPhase == Phase.AfterPreparation || PhaseManager.Instance.CurrentPhase == Phase.AfterBattle) // 준비 및 전투 단계를 벗어나면 카드 드래그를 멈추기
         {
             GetComponent<PlacementSystem>().StopAstralPlacement();
+            GetComponent<PlacementSystem>().StopAstralReplacement();
             GetComponent<PlacementSystem>().StopPrayPledge();
-            // StopPrayPlacement도 꼭 넣자!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            GetComponent<PlacementSystem>().StopPrayCast();
         }
         else
         {
@@ -88,7 +103,7 @@ public class HandSystem : MonoBehaviour
             PutOutCardInBattle();
         }
 
-        remainCardsInDeck.text = $"{CardManager.Instance.CountDeck(thisPlayerTag)} / 25";
+        remainCardsInDeckText.text = $"{CardManager.Instance.CountDeck(thisPlayerTag)} / 25"; // 25로 바꾸자 제발
     }
 
     
@@ -170,13 +185,21 @@ public class HandSystem : MonoBehaviour
         }
         else
         {
-            Debug.Log("기도를 등록하는 단계가 아닙니다.");
-            // 대충 알려주는 UI 
+            if (cannotPrayCoroutine == null)
+            {
+                cannotPrayCoroutine = StartCoroutine(BringerDialogueCannotPray());
+            }
+            else
+            {
+                StopCoroutine(cannotPrayCoroutine);
+                cannotPrayCoroutine = StartCoroutine(BringerDialogueCannotPray());
+            }
+            return;
         }
     }
     void PutOutCardInBattle() // 서약한 기도를 내는 걸 담당하는 메서드
     {
-        if (PhaseManager.Instance.CurrentPhase == Phase.Battle)
+        if (PhaseManager.Instance.CurrentPhase == Phase.Battle && !PhaseManager.Instance.SealPray()) // 기도 봉인이 false 여야 기도 시전을 할 수 있다.
         {
             if (prayCardPosOnHand[prayCardPosA] != null && prayCardPosOnHand[prayCardPosA].GetComponent<InteractableCard>().isHolding)
             {
@@ -192,24 +215,103 @@ public class HandSystem : MonoBehaviour
             }
         }
     }
-    void ManageDragCard(GameObject cardPrefab)// Player 및 Opponent 전용 메서드. OpponentAI는 사용하지 않는다.(리스코프 치환 위배긴 한데..)
+    void ManageDragCard(GameObject cardPrefab)
     {
-        cardPrefab.transform.position = GetComponent<InputSystem>().GetMousePositionOnScreen(); // Holding 중이라면 카드 프리팹이 마우스의 위치를 따라다니는 코드
-
-        if (GetComponent<InputSystem>().CanPlacement())
+        if (PhaseManager.Instance.CurrentPhase == Phase.Battle)
         {
-            MakeTransParent(cardPrefab);
-
-            if (!cardPrefab.GetComponent<InteractableCard>().isStartPlacement)
+            if (PhaseManager.Instance.SealPray())
             {
-                GetComponent<PlacementSystem>().StartPlacement(cardPrefab.GetComponent<InteractableCard>().cardData.Id, cardPrefab);
-                cardPrefab.GetComponent<InteractableCard>().isStartPlacement = true;
+                Debug.Log("흠르르");
+                if (cannotCastPrayCoroutine == null)
+                {
+                    cannotCastPrayCoroutine = StartCoroutine(BringerDialogueCannotCast());
+                }
+                else
+                {
+                    StopCoroutine(cannotCastPrayCoroutine);
+                    cannotCastPrayCoroutine = StartCoroutine(BringerDialogueCannotCast());
+                }
+                return;
+            }
+
+            cardPrefab.transform.position = GetComponent<InputSystem>().GetMousePositionOnScreen(); // Holding 중이라면 카드 프리팹이 마우스의 위치를 따라다니는 코드
+
+            if (GetComponent<InputSystem>().CanPlacement())
+            {
+                MakeTransParent(cardPrefab);
+
+                if (!cardPrefab.GetComponent<InteractableCard>().isStartPlacement)
+                {
+                    GetComponent<PlacementSystem>().StartPrayCast(cardPrefab.GetComponent<InteractableCard>().cardData.Id, cardPrefab);
+                    cardPrefab.GetComponent<InteractableCard>().isStartPlacement = true;
+                }
+            }
+            else
+            {
+                MakeOpaque(cardPrefab);
+                cardPrefab.transform.localScale = sizeWhenPressed;
             }
         }
-        else
+        else if (PhaseManager.Instance.CurrentPhase == Phase.Preparation) // 준비 단계라면 카드의 에센스에 따라서 카드를 낼 수 없게 만든다.
         {
-            MakeOpaque(cardPrefab);
-            cardPrefab.transform.localScale = sizeWhenPressed;
+            if (cardPrefab.GetComponent<InteractableCard>().cardData.Cost > GetComponent<BringerSystem>().CurrentEssence)
+            {
+                if (lackCoroutine == null)
+                {
+                    lackCoroutine = StartCoroutine(BringerDialogueEssenceLack());
+                }
+                else
+                {
+                    StopCoroutine(lackCoroutine);
+                    lackCoroutine = StartCoroutine(BringerDialogueEssenceLack());
+                }
+                return;
+            }
+
+            if (cardPrefab.GetComponent<InteractableCard>().cardData.Cost > GetComponent<BringerSystem>().LimitEssence)
+            {
+                if (limitCoroutine == null)
+                {
+                    limitCoroutine = StartCoroutine(BringerDialogueEssenceLimit());
+                }
+                else
+                {
+                    StopCoroutine(limitCoroutine);
+                    limitCoroutine = StartCoroutine(BringerDialogueEssenceLimit());
+                }
+                return;
+            }
+            if (!cardPrefab.GetComponent<InteractableCard>().cardData.IsAstral && PledgeHandCount >= 3)
+            {
+                if (cannotPrayCoroutine == null)
+                {
+                    cannotPrayCoroutine = StartCoroutine(BringerDialogueCannotPray());
+                }
+                else
+                {
+                    StopCoroutine(cannotPrayCoroutine);
+                    cannotPrayCoroutine = StartCoroutine(BringerDialogueCannotPray());
+                }
+                return;
+            }
+
+            cardPrefab.transform.position = GetComponent<InputSystem>().GetMousePositionOnScreen(); // Holding 중이라면 카드 프리팹이 마우스의 위치를 따라다니는 코드
+
+            if (GetComponent<InputSystem>().CanPlacement())
+            {
+                MakeTransParent(cardPrefab);
+
+                if (!cardPrefab.GetComponent<InteractableCard>().isStartPlacement)
+                {
+                    GetComponent<PlacementSystem>().StartPlacement(cardPrefab.GetComponent<InteractableCard>().cardData.Id, cardPrefab);
+                    cardPrefab.GetComponent<InteractableCard>().isStartPlacement = true;
+                }
+            }
+            else
+            {
+                MakeOpaque(cardPrefab);
+                cardPrefab.transform.localScale = sizeWhenPressed;
+            }
         }
     }
     void MakeTransParent(GameObject cardPrefab)
@@ -280,5 +382,46 @@ public class HandSystem : MonoBehaviour
         BattleHand.gameObject.SetActive(true);
         yield return new WaitForSeconds(0.5f);
         preparationHand.gameObject.SetActive(false);
+    }
+    IEnumerator NotifyDeckFilled()
+    {
+        deckFillNotifierText.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(3f);
+
+        deckFillNotifierText.gameObject.SetActive(false);
+    }
+
+    Coroutine limitCoroutine;
+    IEnumerator BringerDialogueEssenceLimit()
+    {
+        bringerDialogue.SetActive(true);
+        bringerDialogue.GetComponentInChildren<TextMeshProUGUI>().text = "에센스 한계치야";
+        yield return new WaitForSeconds(3f);
+        bringerDialogue.SetActive(false);
+    }
+    Coroutine lackCoroutine;
+    IEnumerator BringerDialogueEssenceLack()
+    {
+        bringerDialogue.SetActive(true);
+        bringerDialogue.GetComponentInChildren<TextMeshProUGUI>().text = "에센스가 부족해";
+        yield return new WaitForSeconds(3f);
+        bringerDialogue.SetActive(false);
+    }
+    Coroutine cannotPrayCoroutine;
+    IEnumerator BringerDialogueCannotPray()
+    {
+        bringerDialogue.SetActive(true);
+        bringerDialogue.GetComponentInChildren<TextMeshProUGUI>().text = "이미 3장의 기도를 서약했어";
+        yield return new WaitForSeconds(3f);
+        bringerDialogue.SetActive(false);
+    }
+    Coroutine cannotCastPrayCoroutine;
+    IEnumerator BringerDialogueCannotCast()
+    {
+        bringerDialogue.SetActive(true);
+        bringerDialogue.GetComponentInChildren<TextMeshProUGUI>().text = "기도를 시전할 수 없어";
+        yield return new WaitForSeconds(3f);
+        bringerDialogue.SetActive(false);
     }
 }

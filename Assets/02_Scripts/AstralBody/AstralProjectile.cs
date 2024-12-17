@@ -3,30 +3,44 @@ using UnityEngine;
 
 public class AstralProjectile : MonoBehaviour
 {
+    [SerializeField] bool isNotDamage = false;
     GameObject target;
     AstralBody casterAstralBody;
-    float projectileSpeed;
+    [HideInInspector] public float projectileDuration;
     private void Update()
     {
-        if (Vector3.Distance(target.transform.GetChild(0).position, transform.position) < 0.1f && target != null) // Distance기에 잘 작동하지 못할 가능성이 있다.
+        if (target != null) //Update는 Instantiate 이후 실행된다.
         {
-            target.GetComponent<AstralBody>().astralStats.Damaged(casterAstralBody.astralStats.Damage);
+            if (Vector3.Distance(target.transform.GetChild(0).position, transform.position) < 0.1f && target != null) // Distance기에 잘 작동하지 못할 가능성이 있다.
+            {
+                if (isNotDamage)
+                {
+                    Destroy(gameObject);
+                }
+                else
+                {
+                    target.GetComponent<AstralBody>().astralStats.Damaged(casterAstralBody.astralStats.Damage);
+                    Destroy(gameObject);
+                }
+            }
+        }
+        else
+        {
             Destroy(gameObject);
         }
-        if (target == null) // 제대로 작동하지 않을 수 있다.
-        {
-            Destroy(gameObject);
-        }
+
+
     }
     public void SetTarget(GameObject target, AstralBody casterAstralBody)
     {
         this.target = target;
         this.casterAstralBody = casterAstralBody;
 
-        projectileSpeed = casterAstralBody.astralStats.Range * 0.2f;
+        projectileDuration = casterAstralBody.astralStats.Range * 0.15f;
 
         transform.position = casterAstralBody.gameObject.transform.GetChild(0).position;
-        transform.DOMove(target.transform.GetChild(0).position, projectileSpeed).SetEase(Ease.Linear);
-        PhaseManager.Instance.SetAstralActionTerm(projectileSpeed + 0.2f);
+        transform.DOMove(target.transform.GetChild(0).position, projectileDuration).SetEase(Ease.Linear);
+        transform.LookAt(target.transform.GetChild(0).position);
+        PhaseManager.Instance.SetAstralActionTerm(projectileDuration + 0.1f);
     }
 }

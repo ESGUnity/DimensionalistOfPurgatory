@@ -7,6 +7,8 @@ public enum StatusEffect
     Seal,
     Declain,
     Encroachment,
+    IncreaseDamage,
+    Invincibility,
     Slain,
     Punish
 }
@@ -27,25 +29,33 @@ public class PhaseStorageBattleInfo
     public List<GameObject> PlayerAstral = new();
     public List<GameObject> OpponentAstral = new();
 
+    public Dictionary<GameObject, Vertex> PlayerAstralOriginPos = new();
+    public Dictionary<GameObject, Vertex> OpponentAstralOriginPos = new();
     PhaseManager phaseManager;
     // 기절
-    List<GameObject> stunnedP = new();
-    List<GameObject> stunnedO = new();
+    public List<GameObject> stunnedP = new();
+    public List<GameObject> stunnedO = new();
     // 봉인
-    List<GameObject> sealedP = new();
-    List<GameObject> sealedO = new();
+    public List<GameObject> sealedP = new();
+    public List<GameObject> sealedO = new();
     // 쇠락
-    List<GameObject> declainedP = new();
-    List<GameObject> declainedO = new();
+    public List<GameObject> declainedP = new();
+    public List<GameObject> declainedO = new();
     // 침식
-    List<GameObject> encroachmentedP = new();
-    List<GameObject> encroachmentedO = new();
+    public List<GameObject> encroachmentedP = new();
+    public List<GameObject> encroachmentedO = new();
+    // 공증
+    public List<GameObject> increaseDamagedP = new();
+    public List<GameObject> increaseDamagedO = new();
+    // 무적
+    public List<GameObject> invincibilityP = new();
+    public List<GameObject> invincibilityO = new();
     // 처치
-    List<GameObject> slainedPThisGame = new();
-    List<GameObject> slainedOThisGame = new();
+    public List<CardData> slainedPThisGame = new();
+    public List<CardData> slainedOThisGame = new();
     // 처형
-    List<GameObject> punishedPThisGame = new();
-    List<GameObject> punishedOThisGame = new();
+    public List<CardData> punishedPThisGame = new();
+    public List<CardData> punishedOThisGame = new();
 
     public PhaseStorageBattleInfo()
     {
@@ -88,24 +98,28 @@ public class PhaseStorageBattleInfo
     }
     public void AddAstralInList(GameObject astral)
     {
-        if (astral.tag == "Player")
+        if (astral.GetComponent<AstralBody>().masterPlayerTag == "Player")
         {
             PlayerAstral.Add(astral);
+            PlayerAstralOriginPos[astral] = astral.GetComponent<AstralBody>().thisGridVertex;
         }
-        else if (astral.tag == "Opponent")
+        else if (astral.GetComponent<AstralBody>().masterPlayerTag == "Opponent")
         {
             OpponentAstral.Add(astral);
+            OpponentAstralOriginPos[astral] = astral.GetComponent<AstralBody>().thisGridVertex;
         }
     }
     public void RemoveAstralInList(GameObject astral)
     {
-        if (astral.tag == "Player")
+        if (astral.GetComponent<AstralBody>().masterPlayerTag == "Player")
         {
             PlayerAstral.Remove(astral);
+            PlayerAstralOriginPos.Remove(astral);
         }
-        else if (astral.tag == "Opponent")
+        else if (astral.GetComponent<AstralBody>().masterPlayerTag == "Opponent")
         {
             OpponentAstral.Remove(astral);
+            OpponentAstralOriginPos.Remove(astral);
         }
     }
     public void NotifyStatusEffect(StatusEffect se, GameObject sufferedAstral) // 이건 상태이상 당한 영체가 호출할 것이다.
@@ -118,7 +132,7 @@ public class PhaseStorageBattleInfo
                     stunnedP.Add(sufferedAstral); // 플레이어 영체가 기절되었다면
                     StunningOTurn?.Invoke(); // 상대 영체에게 기절당했음을 알린다.
                 }
-                else if (sufferedAstral.tag == " Opponent")
+                else if (sufferedAstral.tag == "Opponent")
                 {
                     stunnedO.Add(sufferedAstral);
                     StunningPTurn?.Invoke();
@@ -131,7 +145,7 @@ public class PhaseStorageBattleInfo
                     sealedP.Add(sufferedAstral);
                     SealingOTurn?.Invoke();
                 }
-                else if (sufferedAstral.tag == " Opponent")
+                else if (sufferedAstral.tag == "Opponent")
                 {
                     sealedO.Add(sufferedAstral);
                     SealingPTurn?.Invoke();
@@ -144,7 +158,7 @@ public class PhaseStorageBattleInfo
                     declainedP.Add(sufferedAstral);
                     DeclainingOTurn?.Invoke();
                 }
-                else if (sufferedAstral.tag == " Opponent")
+                else if (sufferedAstral.tag == "Opponent")
                 {
                     declainedO.Add(sufferedAstral);
                     DeclainingPTurn?.Invoke();
@@ -156,21 +170,40 @@ public class PhaseStorageBattleInfo
                 {
                     encroachmentedP.Add(sufferedAstral);
                 }
-                else if (sufferedAstral.tag == " Opponent")
+                else if (sufferedAstral.tag == "Opponent")
                 {
                     encroachmentedO.Add(sufferedAstral);
                 }
                 break;
-
+            case StatusEffect.IncreaseDamage: // 공증 역시 침식처럼 단순 디스펠 시 버프가 있는 영체를 쉽게 찾기 위한 용도.
+                if (sufferedAstral.tag == "Player")
+                {
+                    increaseDamagedP.Add(sufferedAstral);
+                }
+                else if (sufferedAstral.tag == "Opponent")
+                {
+                    increaseDamagedO.Add(sufferedAstral);
+                }
+                break;
+            case StatusEffect.Invincibility: // 무적 역시 침식처럼 단순 디스펠 시 버프가 있는 영체를 쉽게 찾기 위한 용도.
+                if (sufferedAstral.tag == "Player")
+                {
+                    invincibilityP.Add(sufferedAstral);
+                }
+                else if (sufferedAstral.tag == "Opponent")
+                {
+                    invincibilityO.Add(sufferedAstral);
+                }
+                break;
             case StatusEffect.Slain:
                 if (sufferedAstral.tag == "Player")
                 {
-                    slainedPThisGame.Add(sufferedAstral);
+                    slainedPThisGame.Add(sufferedAstral.GetComponent<AstralBody>().cardData);
                     SlainingOTurn?.Invoke();
                 }
-                else if (sufferedAstral.tag == " Opponent")
+                else if (sufferedAstral.tag == "Opponent")
                 {
-                    slainedOThisGame.Add(sufferedAstral);
+                    slainedOThisGame.Add(sufferedAstral.GetComponent<AstralBody>().cardData);
                     SlainingPTurn?.Invoke();
                 }
                 break;
@@ -178,12 +211,12 @@ public class PhaseStorageBattleInfo
             case StatusEffect.Punish:
                 if (sufferedAstral.tag == "Player")
                 {
-                    punishedPThisGame.Add(sufferedAstral);
+                    punishedPThisGame.Add(sufferedAstral.GetComponent<AstralBody>().cardData);
                     PunishingOTurn?.Invoke();
                 }
-                else if (sufferedAstral.tag == " Opponent")
+                else if (sufferedAstral.tag == "Opponent")
                 {
-                    punishedOThisGame.Add(sufferedAstral);
+                    punishedOThisGame.Add(sufferedAstral.GetComponent<AstralBody>().cardData);
                     PunishingPTurn?.Invoke();
                 }
                 break;
@@ -202,7 +235,7 @@ public class PhaseStorageBattleInfo
                         stunnedP.Remove(sufferedAstral);
                     }
                 }
-                else if (sufferedAstral.tag == " Opponent")
+                else if (sufferedAstral.tag == "Opponent")
                 {
                     if (stunnedP.Contains(sufferedAstral))
                     {
@@ -220,7 +253,7 @@ public class PhaseStorageBattleInfo
 
                     }
                 }
-                else if (sufferedAstral.tag == " Opponent")
+                else if (sufferedAstral.tag == "Opponent")
                 {
                     if (sealedO.Contains(sufferedAstral))
                     {
@@ -237,7 +270,7 @@ public class PhaseStorageBattleInfo
                         declainedP.Remove(sufferedAstral);
                     }
                 }
-                else if (sufferedAstral.tag == " Opponent")
+                else if (sufferedAstral.tag == "Opponent")
                 {
                     if (declainedO.Contains(sufferedAstral))
                     {
@@ -253,11 +286,43 @@ public class PhaseStorageBattleInfo
                         encroachmentedP.Remove(sufferedAstral);
                     }
                 }
-                else if (sufferedAstral.tag == " Opponent")
+                else if (sufferedAstral.tag == "Opponent")
                 {
                     if (encroachmentedO.Contains(sufferedAstral))
                     {
                         encroachmentedO.Remove(sufferedAstral);
+                    }
+                }
+                break;
+            case StatusEffect.IncreaseDamage: // 뺴줘야 디스펠할 영체를 또 찾을 수 있겠지?
+                if (sufferedAstral.tag == "Player")
+                {
+                    if (increaseDamagedP.Contains(sufferedAstral))
+                    {
+                        increaseDamagedP.Remove(sufferedAstral);
+                    }
+                }
+                else if (sufferedAstral.tag == "Opponent")
+                {
+                    if (increaseDamagedO.Contains(sufferedAstral))
+                    {
+                        increaseDamagedO.Remove(sufferedAstral);
+                    }
+                }
+                break;
+            case StatusEffect.Invincibility: // 뺴줘야 디스펠할 영체를 또 찾을 수 있겠지?
+                if (sufferedAstral.tag == "Player")
+                {
+                    if (invincibilityP.Contains(sufferedAstral))
+                    {
+                        invincibilityP.Remove(sufferedAstral);
+                    }
+                }
+                else if (sufferedAstral.tag == "Opponent")
+                {
+                    if (invincibilityO.Contains(sufferedAstral))
+                    {
+                        invincibilityO.Remove(sufferedAstral);
                     }
                 }
                 break;

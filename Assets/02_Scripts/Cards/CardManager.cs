@@ -1,14 +1,12 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CardManager : MonoBehaviour
 {
     List<CardData> originPlayerDeck;
-    List<CardData> originOpponentAIDeck;
     List<CardData> originOpponentDeck;
+
     List<CardData> playerDeck = new();
-    List<CardData> opponentAIDeck = new();
     List<CardData> opponentDeck = new();
 
     private static CardManager instance;
@@ -21,7 +19,7 @@ public class CardManager : MonoBehaviour
     void Start()
     {
         originPlayerDeck = DeckManager.Instance.GetPlayerDeck();
-        originOpponentAIDeck = DeckManager.Instance.GetOpponentAIDeck();
+        originOpponentDeck = DeckManager.Instance.GetOpponentDeck();
     }
 
     public void FillDeck(string playerTag) // 태그에 따라 덱을 채워주는 메서드
@@ -35,14 +33,14 @@ public class CardManager : MonoBehaviour
             }
             ShuffleDeck(playerDeck);
         }
-        else if (playerTag == "OpponentAI")
+        else if (playerTag == "Opponent")
         {
-            foreach (CardData cardData in originOpponentAIDeck)
+            foreach (CardData cardData in originOpponentDeck)
             {
                 CardData clone = (CardData)cardData.Clone();
-                opponentAIDeck.Add(clone);
+                opponentDeck.Add(clone);
             }
-            ShuffleDeck(opponentAIDeck);
+            ShuffleDeck(opponentDeck);
         }
     }
     public CardData DrawCard(string playerTag) // 태그에 따라 덱에서 카드를 뽑아주는 메서드
@@ -56,12 +54,12 @@ public class CardManager : MonoBehaviour
                 return drawCard;
             }
         }
-        else if (playerTag == "OpponentAI")
+        else if (playerTag == "Opponent")
         {
-            if (opponentAIDeck[0] != null)
+            if (opponentDeck[0] != null)
             {
-                CardData drawCard = opponentAIDeck[0];
-                opponentAIDeck.RemoveAt(0);
+                CardData drawCard = opponentDeck[0];
+                opponentDeck.RemoveAt(0);
                 return drawCard;
             }
         }
@@ -74,9 +72,9 @@ public class CardManager : MonoBehaviour
         {
             return playerDeck.Count;
         }
-        else if (playerTag == "OpponentAI")
+        else if (playerTag == "Opponent")
         {
-            return opponentAIDeck.Count;
+            return opponentDeck.Count;
         }
 
         return default;

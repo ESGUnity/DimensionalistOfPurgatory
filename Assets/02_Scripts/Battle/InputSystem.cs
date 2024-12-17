@@ -8,6 +8,7 @@ public class InputSystem : MonoBehaviour
     public event Action OnClickedLeft;
     public event Action OnPressedLeft;
     public event Action OnReleasedLeft;
+    public event Action OnClickedRight;
 
     InputActionAsset inputActions;
     InputAction leftClickAction;
@@ -17,6 +18,7 @@ public class InputSystem : MonoBehaviour
     LayerMask entireLayerMask;
     LayerMask astralLayerMask;
     string thisPlayerTag;
+    string opponentTag;
 
     private void Awake()
     {
@@ -24,11 +26,13 @@ public class InputSystem : MonoBehaviour
 
         if (thisPlayerTag == "Player")
         {
+            opponentTag = "Opponent";
             entireLayerMask = LayerMask.GetMask("PlayerField");
             astralLayerMask = LayerMask.GetMask("PlayerAstralField");
         }
-        else if (thisPlayerTag == "OpponentAI")
+        else if (thisPlayerTag == "Opponent")
         {
+            opponentTag = "Player";
             entireLayerMask = LayerMask.GetMask("OpponentField");
             astralLayerMask = LayerMask.GetMask("OpponentAstralField");
         }
@@ -41,6 +45,7 @@ public class InputSystem : MonoBehaviour
 
         leftClickAction.started += (context) => OnClickedLeft?.Invoke();
         leftClickAction.canceled += (context) => OnReleasedLeft?.Invoke();
+        rightClickAction.started += (context) => OnClickedRight?.Invoke();
     }
     private void OnEnable()
     {
@@ -56,6 +61,11 @@ public class InputSystem : MonoBehaviour
         if (leftClickAction.IsPressed())
         {
             OnPressedLeft?.Invoke();
+        }
+
+        if (GetAstralOnMouseCursor() != null && leftClickAction.WasPressedThisFrame())
+        {
+            GetComponent<PlacementSystem>().StartAstralReplacement(GetAstralOnMouseCursor());
         }
     }
 
@@ -114,14 +124,39 @@ public class InputSystem : MonoBehaviour
 
         return false;
     }
-    public float GetViewportPosition()
-    {
-        Vector3 mousePos = Input.mousePosition;
-        Vector3 viewportPosition = PlayerCamera.ScreenToViewportPoint(mousePos);
-        return viewportPosition.y;
-    }
     public Vector3 GetMousePositionOnScreen()
     {
         return Input.mousePosition;
+    }
+    public GameObject GetAstralOnMouseCursor()
+    {
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = PlayerCamera.nearClipPlane;
+        Ray ray = PlayerCamera.ScreenPointToRay(mousePos);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 1000))
+        {
+            if (hit.collider.gameObject.tag == thisPlayerTag)
+            {
+                UIManager.Instance.OnAstralInfoNotifier(hit.collider.gameObject);
+                return hit.collider.gameObject;
+            }
+            else if (hit.collider.gameObject.tag == opponentTag)
+            {
+                UIManager.Instance.OnAstralInfoNotifier(hit.collider.gameObject);
+                return null;
+            }
+            else
+            {
+                UIManager.Instance.OffAstralInfoNotifier();
+                return null;
+            }
+        }
+        else
+        {
+            UIManager.Instance.OffAstralInfoNotifier();
+            return null;
+        }
     }
 }
